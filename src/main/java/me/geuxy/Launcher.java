@@ -33,6 +33,10 @@ public enum Launcher {
         this.libraryManager = new LibraryManager(directory);
         this.config = new Config(new GsonBuilder().setPrettyPrinting().create());
 
+        if(!directory.exists()) {
+            directory.mkdir();
+        }
+
         new Window();
     }
 
@@ -51,6 +55,8 @@ public enum Launcher {
                     UnzipUtil unzipper = new UnzipUtil();
 
                     unzipper.unzip(binZip.getPath(), binDirectory.getPath());
+
+                    binZip.delete();
                 } else {
                     Logger.error("Failed to download natives");
                 }
