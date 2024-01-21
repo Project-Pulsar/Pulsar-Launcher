@@ -1,7 +1,7 @@
 package me.geuxy.library;
 
 import me.geuxy.utils.FileUtil;
-import me.geuxy.utils.OSUtil;
+import me.geuxy.utils.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,12 @@ import java.util.Scanner;
 public class LibraryManager {
 
     private final List<Library> libraries = new ArrayList<>();
+
+    private final File directory;
+
+    public LibraryManager(File directory) {
+        this.directory = directory;
+    }
 
     public void setupLibraries() {
         try {
@@ -28,50 +34,42 @@ public class LibraryManager {
 
     }
 
-    public void setup() {
-        File launcherDir = new File(OSUtil.getOS().getDirectory() + "libraries");
+    public void addLibraries() {
+        File jarsDirectory = new File(directory, "jars");
 
-        this.makeDirectory(launcherDir);
+        this.createDirectory(jarsDirectory);
 
         libraries.forEach(library -> {
-            String last = "";
+            File jar = new File(jarsDirectory, library.getName() + ".jar");
 
-            for(String path : library.getPath().split("/")) {
-                File filePath = new File(launcherDir, last.isEmpty() ? path : last + "/" + path);
-
-                if(!filePath.exists()) {
-                    filePath.mkdir();
-                }
-                last += "/" + path;
-            }
-            File jar = new File(launcherDir, library.getPath().replace("/", File.separator) + File.separator + library.getName() + "-" + library.getVersion() + ".jar");
+            boolean wrongSize = jar.length() != library.getBytes();
 
             if(!jar.exists()) {
                 this.downloadLibrary(library, jar);
 
             } else {
-                if(jar.length() != library.getBytes()) {
+                if(wrongSize) {
                     if(jar.delete()) {
                         this.downloadLibrary(library, jar);
 
                     } else {
-                        System.err.println("Failed to delete " + library.getName());
+                        Logger.error("Failed to delete " + library.getName());
                     }
 
                 } else {
-                    System.out.println("Found " + library.getName());
+                    Logger.info("Found " + library.getName());
                 }
             }
         });
     }
 
-    private void makeDirectory(File file) {
+    private void createDirectory(File file) {
         if(!file.exists()) {
             if(file.mkdir()) {
-                System.out.println("Created new directory: " + file.getPath());
+                Logger.info("Created new directory: " + file.getPath());
 
             } else {
-                System.err.println("Failed to make directory: " + file.getPath());
+                Logger.error("Failed to make directory: " + file.getPath());
             }
         }
     }
@@ -83,10 +81,6 @@ public class LibraryManager {
         } else {
             System.err.println("Failed to download " + library.getName());
         }
-    }
-
-    public List<Library> getLibraries() {
-        return libraries;
     }
 
 }

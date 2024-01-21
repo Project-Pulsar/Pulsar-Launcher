@@ -20,8 +20,16 @@ public enum OSUtil {
         return osName.contains("windows") ? WINDOWS : osName.contains("mac") ? MAC : LINUX;
     }
 
-    public String getDirectory() {
+    public String getMinecraft() {
         return System.getProperty("user.home") + File.separator + directory;
+    }
+
+    public String getPulsar() {
+        return System.getProperty("user.home") + File.separator + directory.replace("minecraft", "pulsarlauncher");
+    }
+
+    public static boolean isLinux() {
+        return System.getProperty("os.name").toLowerCase().contains("linux");
     }
 
 }

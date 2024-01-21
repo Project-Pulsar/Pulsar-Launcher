@@ -1,8 +1,9 @@
 package me.geuxy.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.*;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -25,6 +26,30 @@ public class FileUtil {
 
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    public static JsonObject readJson(File file) {
+        JsonObject json = null;
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            json = (JsonObject) new JsonParser().parse(reader);
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
+    public static void write(File file, String output) {
+        try {
+            PrintWriter writer = new PrintWriter(new FileWriter(file));
+            writer.println(output);
+            writer.close();
+
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 

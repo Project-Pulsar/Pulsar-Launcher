@@ -1,67 +1,99 @@
 package me.geuxy;
 
-import me.geuxy.library.Library;
-import me.geuxy.library.LibraryManager;
-import me.geuxy.utils.OSUtil;
+import com.formdev.flatlaf.FlatDarculaLaf;
 
+import com.google.gson.GsonBuilder;
+import lombok.Getter;
+import me.geuxy.config.Config;
+import me.geuxy.gui.Window;
+import me.geuxy.library.LibraryManager;
+import me.geuxy.utils.FileUtil;
+import me.geuxy.utils.Logger;
+import me.geuxy.utils.OSUtil;
+import me.geuxy.utils.UnzipUtil;
+
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
+@Getter
 public enum Launcher {
 
     INSTANCE;
 
+    private File directory;
+
     private LibraryManager libraryManager;
 
+    private Config config;
+
     public void init() {
-        this.libraryManager = new LibraryManager();
-        libraryManager.setupLibraries();
-        libraryManager.setup();
+        this.directory = new File(OSUtil.getOS().getPulsar());
+        this.libraryManager = new LibraryManager(directory);
+        this.config = new Config(new GsonBuilder().setPrettyPrinting().create());
 
-        String mcDir = OSUtil.getOS().getDirectory();
+        new Window();
+    }
 
-        String exec = "java -Xms1G -Xmx4G -Djava.library.path=\"" + mcDir + "bin" + File.separator + "2c19601cb32d7c6f40bcc585b310b4adf8754b81" + "\" -cp " + "\"";
-
-        int i = 0;
-        for(Library library : libraryManager.getLibraries()) {
-            exec += (i == 0 ? "" : i == libraryManager.getLibraries().size() ? "" : ";") + mcDir + "libraries" + File.separator + library.getPath() + File.separator + library.getName() + "-" + library.getVersion() + ".jar";
-            i++;
-        }
-
-        exec += "\" net.minecraft.client.main.Main -uuid N/A -accessToken none --assetIndex 1.8 -gameDir " + mcDir;
-
-        // Prints the command
-        System.out.println(exec);
-
+    public void startClient(int minimumRam, int maximumRam) {
         try {
-            Process process = Runtime.getRuntime().exec(exec);
+            libraryManager.setupLibraries();
+            libraryManager.addLibraries();
+
+            File binDirectory = new File(directory, "bin");
+            File binZip = new File(directory, "bin.zip");
+
+            if(!binDirectory.exists()) {
+                if(FileUtil.download("https://github.com/Geuxy/Pulsar/raw/main/bin.zip", binZip)) {
+                    Logger.info("Downloaded natives");
+
+                    UnzipUtil unzipper = new UnzipUtil();
+
+                    unzipper.unzip(binZip.getPath(), binDirectory.getPath());
+                } else {
+                    Logger.error("Failed to download natives");
+                }
+
+            } else {
+                Logger.info("Found natives");
+            }
+
+            String jarsDir = directory.getPath() + File.separator + "jars" + File.separator;
+            String gameDir = OSUtil.getOS().getMinecraft();
+            Process process = Runtime.getRuntime().exec("java -Xms" + minimumRam + "G -Xmx" + maximumRam + "G -Djava.library.path=" + OSUtil.getOS().getPulsar() + File.separator + "bin -cp " + jarsDir + "*:" + jarsDir + "Pulsar.jar net.minecraft.client.main.Main -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir);
 
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-            String s;
+            String line;
 
-            while((s = input.readLine()) != null) {
-                System.out.println(s);
+            while((line = input.readLine()) != null) {
+                System.out.println(line);
             }
 
-            while((s = error.readLine()) != null) {
-                System.out.println(s);
+            while((line = error.readLine()) != null) {
+                System.out.println(line);
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    public void stop() {
-
-    }
-
     public static void main(String[] args) {
-        INSTANCE.init();
+        try {
+            if(OSUtil.isLinux()) {
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 
-        Runtime.getRuntime().addShutdownHook(new Thread(INSTANCE::stop));
+            } else {
+                UIManager.setLookAndFeel(new FlatDarculaLaf());
+            }
+
+        } catch(Exception e) {
+            Logger.error("Failed to apply theme");
+        }
+
+        INSTANCE.init();
     }
 
 }
