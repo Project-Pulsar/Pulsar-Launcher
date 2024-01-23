@@ -1,7 +1,7 @@
 package me.geuxy.library;
 
-import me.geuxy.utils.FileUtil;
-import me.geuxy.utils.Logger;
+import me.geuxy.utils.file.FileUtil;
+import me.geuxy.utils.console.Logger;
 
 import java.io.File;
 import java.io.IOException;

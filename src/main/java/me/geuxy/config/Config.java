@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 
 import me.geuxy.gui.Window;
-import me.geuxy.utils.FileUtil;
+import me.geuxy.utils.file.FileUtil;
 
 import java.io.File;
 

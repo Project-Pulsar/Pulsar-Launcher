@@ -1,18 +1,17 @@
 package me.geuxy;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-
 import com.google.gson.GsonBuilder;
+
 import lombok.Getter;
+
 import me.geuxy.config.Config;
 import me.geuxy.gui.Window;
 import me.geuxy.library.LibraryManager;
-import me.geuxy.utils.FileUtil;
-import me.geuxy.utils.Logger;
-import me.geuxy.utils.OSUtil;
-import me.geuxy.utils.UnzipUtil;
+import me.geuxy.utils.file.FileUtil;
+import me.geuxy.utils.console.Logger;
+import me.geuxy.utils.system.OSUtil;
+import me.geuxy.utils.file.UnzipUtil;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -55,8 +54,6 @@ public enum Launcher {
                     UnzipUtil unzipper = new UnzipUtil();
 
                     unzipper.unzip(binZip.getPath(), binDirectory.getPath());
-
-                    binZip.delete();
                 } else {
                     Logger.error("Failed to download natives");
                 }
@@ -65,41 +62,34 @@ public enum Launcher {
                 Logger.info("Found natives");
             }
 
+            Logger.debug("Minimum Ram: " + minimumRam);
+            Logger.debug("Maximum Ram: " + maximumRam);
+
             String jarsDir = directory.getPath() + File.separator + "jars" + File.separator;
             String gameDir = OSUtil.getOS().getMinecraft();
-            Process process = Runtime.getRuntime().exec("java -Xms" + minimumRam + "G -Xmx" + maximumRam + "G -Djava.library.path=" + OSUtil.getOS().getPulsar() + File.separator + "bin -cp " + jarsDir + "*:" + jarsDir + "Pulsar.jar net.minecraft.client.main.Main -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir);
 
-            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader error = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String ram = "-Xms" + minimumRam + "G -Xmx" + maximumRam + "G";
+            String bin = "-Djava.library.path=" + directory.getPath() + File.separator + "bin";
+            String classpath = "-cp " + jarsDir + "*:" + jarsDir + "Pulsar.jar net.minecraft.client.main.Main";
+
+            String command = "java " + ram + " " + bin + " " + classpath + " -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir;
+
+            Logger.debug(command);
+
+            Process process = Runtime.getRuntime().exec(command);
 
             String line;
 
-            while((line = input.readLine()) != null) {
+            while((line = new BufferedReader(new InputStreamReader(process.getInputStream())).readLine()) != null) {
                 System.out.println(line);
             }
 
-            while((line = error.readLine()) != null) {
+            while((line = new BufferedReader(new InputStreamReader(process.getErrorStream())).readLine()) != null) {
                 System.out.println(line);
             }
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void main(String[] args) {
-        try {
-            if(OSUtil.isLinux()) {
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-
-            } else {
-                UIManager.setLookAndFeel(new FlatDarculaLaf());
-            }
-
-        } catch(Exception e) {
-            Logger.error("Failed to apply theme");
-        }
-
-        INSTANCE.init();
     }
 
 }

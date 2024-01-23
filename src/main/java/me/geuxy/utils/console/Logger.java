@@ -1,6 +1,10 @@
-package me.geuxy.utils;
+package me.geuxy.utils.console;
 
 public class Logger {
+
+    public static void debug(Object object) {
+        System.out.println("[PulsarLauncher/DEBUG] " + object);
+    }
 
     public static void info(Object object) {
         System.out.println("[PulsarLauncher/INFO] " + object);

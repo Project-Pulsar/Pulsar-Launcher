@@ -5,7 +5,7 @@ plugins {
 group = 'me.geuxy'
 version = '1.0-SNAPSHOT'
 
-def main = 'me.geuxy.Launcher'
+def main = 'me.geuxy.main.Main'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'

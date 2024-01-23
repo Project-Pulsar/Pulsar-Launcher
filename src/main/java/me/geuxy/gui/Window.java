@@ -13,11 +13,16 @@ import java.awt.*;
 @Getter @Setter
 public class Window extends JFrame {
 
-    private final JPanel panel, settings;
-    private final JSlider minRam, maxRam;
+    private final JPanel homePanel;
+    private final JPanel settingsPanel;
+
+    private final JSlider minimumRamSlider;
+    private final JSlider maximumRamSlider;
+
     private final JCheckBox hideOnLaunch;
 
-    private int minimumRam = 1, maximumRam = 1;
+    private int minimumRam = 1;
+    private int maximumRam = 1;
 
     private boolean hide;
 
@@ -30,57 +35,61 @@ public class Window extends JFrame {
         this.setResizable(false);
 
         JLabel label = new JLabel("Pulsar", JLabel.CENTER);
-        label.setFont(new Font("kilton", Font.PLAIN, 165));
+
+        try {
+            label.setFont(Font.createFont(Font.TRUETYPE_FONT, ClassLoader.getSystemResource("assets/kilton.otf").openStream()).deriveFont(165F));
+        } catch(Exception ignored) {
+        }
 
         /*
          * Home
          */
-        this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(this.getWidth() - 10, 140));
-        this.panel.setLayout(new GridLayout(3, 1));
+        this.homePanel = new JPanel();
+        this.homePanel.setPreferredSize(new Dimension(this.getWidth() - 10, 140));
+        this.homePanel.setLayout(new GridLayout(3, 1));
 
         Font font = new Font("Arial", Font.PLAIN, 20);
 
         Button launchButton = new Button("Launch");
         launchButton.setFont(font);
         launchButton.addActionListener(new LaunchAction(this));
-        this.panel.add(launchButton);
+        this.homePanel.add(launchButton);
 
         Button settingsButton = new Button("Settings");
         settingsButton.setFont(font);
         settingsButton.addActionListener(e -> setupSettings());
-        this.panel.add(settingsButton);
+        this.homePanel.add(settingsButton);
 
         Button quitButton = new Button("Quit");
         quitButton.setFont(font);
         quitButton.addActionListener(e -> System.exit(0));
-        this.panel.add(quitButton);
+        this.homePanel.add(quitButton);
 
         /*
          * Settings
          */
-        this.settings = new JPanel();
-        this.settings.setPreferredSize(new Dimension(this.getWidth() - 10, 140));
-        this.settings.setLayout(new GridLayout(3, 2));
+        this.settingsPanel = new JPanel();
+        this.settingsPanel.setPreferredSize(new Dimension(this.getWidth() - 10, 140));
+        this.settingsPanel.setLayout(new GridLayout(3, 2));
 
-        this.settings.add(new JLabel("Minimum Ram"));
-        this.settings.add(new JLabel("Maximum Ram"));
+        this.settingsPanel.add(new JLabel("Minimum Ram"));
+        this.settingsPanel.add(new JLabel("Maximum Ram"));
 
-        this.minRam = new JSlider(1, 8);
-        this.minRam.addChangeListener(e -> this.minimumRam = minRam.getValue());
-        this.settings.add(minRam);
+        this.minimumRamSlider = new JSlider(1, 8);
+        this.minimumRamSlider.addChangeListener(e -> this.minimumRam = minimumRamSlider.getValue());
+        this.settingsPanel.add(minimumRamSlider);
 
-        this.maxRam = new JSlider(1, 8);
-        this.maxRam.addChangeListener(e -> this.maximumRam = maxRam.getValue());
-        this.settings.add(maxRam);
+        this.maximumRamSlider = new JSlider(1, 8);
+        this.maximumRamSlider.addChangeListener(e -> this.maximumRam = maximumRamSlider.getValue());
+        this.settingsPanel.add(maximumRamSlider);
 
         this.hideOnLaunch = new JCheckBox("Hide on launch");
         this.hideOnLaunch.addActionListener(e -> hide = !hide);
-        this.settings.add(hideOnLaunch);
+        this.settingsPanel.add(hideOnLaunch);
 
         Button test = new Button("Back");
         test.addActionListener(e -> setupHome());
-        this.settings.add(test);
+        this.settingsPanel.add(test);
 
         /*
          * Setup
@@ -88,25 +97,26 @@ public class Window extends JFrame {
         this.setupHome();
 
         this.add(label);
-        this.add(panel);
+        this.add(homePanel);
 
         this.repaint();
 
         Launcher.INSTANCE.getConfig().load(Launcher.INSTANCE.getDirectory(), this);
+
         this.setVisible(true);
     }
 
     private void setupHome() {
-        this.remove(settings);
-        this.add(panel);
+        this.remove(settingsPanel);
+        this.add(homePanel);
         validate();
         repaint();
 
     }
 
     private void setupSettings() {
-        this.remove(panel);
-        this.add(settings);
+        this.remove(homePanel);
+        this.add(settingsPanel);
         validate();
         repaint();
     }
@@ -114,8 +124,8 @@ public class Window extends JFrame {
     public void setValues(int minimumRam, int maximumRam, boolean hide) {
         this.minimumRam = minimumRam;
         this.maximumRam = maximumRam;
-        this.minRam.setValue(minimumRam);
-        this.maxRam.setValue(maximumRam);
+        this.minimumRamSlider.setValue(minimumRam);
+        this.maximumRamSlider.setValue(maximumRam);
         this.hide = hide;
         this.hideOnLaunch.setSelected(hide);
     }
