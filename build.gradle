@@ -13,10 +13,18 @@ tasks.withType(JavaCompile).configureEach {
 
 jar {
     manifest { attributes 'Main-Class': main }
+
+    from {
+        configurations.extraLibs.collect {it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    extraLibs
 }
 
 dependencies {
@@ -26,8 +34,11 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    implementation group: 'com.formdev', name: 'flatlaf', version: '0.20'
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    compileOnly group: 'com.formdev', name: 'flatlaf', version: '0.20'
+    compileOnly group: 'com.google.code.gson', name: 'gson', version: '2.7'
+
+    extraLibs group: 'com.formdev', name: 'flatlaf', version: '0.20'
+    extraLibs group: 'com.google.code.gson', name: 'gson', version: '2.7'
 
 }
 
