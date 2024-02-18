@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import me.geuxy.Launcher;
 import me.geuxy.actions.LaunchAction;
-import me.geuxy.gui.components.Button;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,17 +49,20 @@ public class Window extends JFrame {
 
         Font font = new Font("Arial", Font.PLAIN, 20);
 
-        Button launchButton = new Button("Launch");
+        JButton launchButton = new JButton("Launch");
+        launchButton.setFocusPainted(false);
         launchButton.setFont(font);
         launchButton.addActionListener(new LaunchAction(this));
         this.homePanel.add(launchButton);
 
-        Button settingsButton = new Button("Settings");
+        JButton settingsButton = new JButton("Settings");
+        settingsButton.setFocusPainted(false);
         settingsButton.setFont(font);
         settingsButton.addActionListener(e -> setupSettings());
         this.homePanel.add(settingsButton);
 
-        Button quitButton = new Button("Quit");
+        JButton quitButton = new JButton("Quit");
+        quitButton.setFocusPainted(false);
         quitButton.setFont(font);
         quitButton.addActionListener(e -> System.exit(0));
         this.homePanel.add(quitButton);

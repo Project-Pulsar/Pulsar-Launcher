@@ -25,7 +25,7 @@ public enum OSUtil {
     }
 
     public String getPulsar() {
-        return System.getProperty("user.home") + File.separator + directory.replace("minecraft", "pulsarlauncher");
+        return System.getProperty("user.home") + File.separator + directory.replace("minecraft", "pulsarlauncher").replace(".pulsarlauncher", "pulsarlauncher");
     }
 
     public static boolean isLinux() {

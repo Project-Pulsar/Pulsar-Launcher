@@ -14,7 +14,9 @@ import me.geuxy.utils.file.UnzipUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.Key;
 
 @Getter
 public enum Launcher {
@@ -68,15 +70,16 @@ public enum Launcher {
             String jarsDir = directory.getPath() + File.separator + "jars" + File.separator;
             String gameDir = OSUtil.getOS().getMinecraft();
 
-            String ram = "-Xms" + minimumRam + "G -Xmx" + maximumRam + "G";
+            String minRam = "-Xms" + minimumRam + "G";
+            String maxRam = "-Xmx" + maximumRam + "G";
             String bin = "-Djava.library.path=" + directory.getPath() + File.separator + "bin";
-            String classpath = "-cp " + jarsDir + "*:" + jarsDir + "Pulsar.jar net.minecraft.client.main.Main";
 
-            String command = "java " + ram + " " + bin + " " + classpath + " -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir;
+            //String command = "java " + ram + " " + bin + " " + classpath + " -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir;
 
-            Logger.debug(command);
+            //Logger.debug(command);
+            String[] cmd = {"java", minRam, maxRam, "-Djava.library.path=" + directory.getPath().replace(" ", "_") + File.separator + "bin", "-cp", jarsDir + "*:" + jarsDir + "Pulsar.jar", "net.minecraft.client.main.Main", "-uuid", "N/A", "-version", "1.8.8", "--accessToken", "none", "--assetIndex", "1.8", "--gameDir", gameDir};
 
-            Process process = Runtime.getRuntime().exec(command);
+            Process process = Runtime.getRuntime().exec(cmd);
 
             String line;
 
@@ -87,8 +90,8 @@ public enum Launcher {
             while((line = new BufferedReader(new InputStreamReader(process.getErrorStream())).readLine()) != null) {
                 System.out.println(line);
             }
-        } catch(Exception e) {
-            throw new RuntimeException(e);
+        } catch(IOException e) {
+            e.printStackTrace();
         }
     }
 
