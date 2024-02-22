@@ -14,12 +14,6 @@ public class LibraryManager {
 
     private final List<Library> libraries = new ArrayList<>();
 
-    private final File directory;
-
-    public LibraryManager(File directory) {
-        this.directory = directory;
-    }
-
     public void setupLibraries() {
         try {
             Scanner scanner = new Scanner(new URL("https://raw.githubusercontent.com/Geuxy/Pulsar/main/libraries.txt").openStream());
@@ -35,7 +29,7 @@ public class LibraryManager {
     }
 
     public void addLibraries() {
-        File jarsDirectory = new File(directory, "jars");
+        File jarsDirectory = new File("jars");
 
         this.createDirectory(jarsDirectory);
 

@@ -22,18 +22,16 @@ public class Config {
         json.addProperty("Maximum Ram", maximumRam);
         json.addProperty("Hide on launch", hide);
 
-        FileUtil.write(new File(directory, "config.json"), gson.toJson(json));
+        FileUtil.write(directory, gson.toJson(json));
     }
 
     public void load(File directory, Window window) {
-        File file = new File(directory, "config.json");
-
-        if(!file.exists()) {
+        if(!directory.exists()) {
             this.save(directory, 1, 1, false);
             return;
         }
 
-        JsonObject json = FileUtil.readJson(file);
+        JsonObject json = FileUtil.readJson(directory);
 
         window.setValues(json.get("Minimum Ram").getAsInt(), json.get("Maximum Ram").getAsInt(), json.get("Hide on launch").getAsBoolean());
     }

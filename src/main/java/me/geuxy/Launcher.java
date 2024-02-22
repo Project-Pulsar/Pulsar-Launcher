@@ -14,40 +14,39 @@ import me.geuxy.utils.file.UnzipUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.Key;
 
 @Getter
 public enum Launcher {
 
     INSTANCE;
 
-    private File directory;
-
     private LibraryManager libraryManager;
 
     private Config config;
 
-    public void init() {
-        this.directory = new File(OSUtil.getOS().getPulsar());
-        this.libraryManager = new LibraryManager(directory);
-        this.config = new Config(new GsonBuilder().setPrettyPrinting().create());
+    private boolean running;
 
-        if(!directory.exists()) {
-            directory.mkdir();
-        }
+    public void init() {
+        this.libraryManager = new LibraryManager();
+        this.config = new Config(new GsonBuilder().setPrettyPrinting().create());
 
         new Window();
     }
 
     public void startClient(int minimumRam, int maximumRam) {
+        if(running) {
+            Logger.warn("Already running");
+            return;
+        }
+
+        this.running = true;
         try {
             libraryManager.setupLibraries();
             libraryManager.addLibraries();
 
-            File binDirectory = new File(directory, "bin");
-            File binZip = new File(directory, "bin.zip");
+            File binDirectory = new File("bin");
+            File binZip = new File("bin.zip");
 
             if(!binDirectory.exists()) {
                 if(FileUtil.download("https://github.com/Geuxy/Pulsar/raw/main/bin.zip", binZip)) {
@@ -67,19 +66,18 @@ public enum Launcher {
             Logger.debug("Minimum Ram: " + minimumRam);
             Logger.debug("Maximum Ram: " + maximumRam);
 
-            String jarsDir = directory.getPath() + File.separator + "jars" + File.separator;
+            String jarsDir = "jars" + File.separator;
             String gameDir = OSUtil.getOS().getMinecraft();
 
             String minRam = "-Xms" + minimumRam + "G";
             String maxRam = "-Xmx" + maximumRam + "G";
-            String bin = "-Djava.library.path=" + directory.getPath() + File.separator + "bin";
 
-            //String command = "java " + ram + " " + bin + " " + classpath + " -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir;
+            String exec = "java " + minRam + " " + maxRam + " -Djava.library.path=bin -cp " + jarsDir + "*:" + jarsDir + "Pulsar.jar net.minecraft.client.main.Main -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir;
 
-            //Logger.debug(command);
-            String[] cmd = {"java", minRam, maxRam, "-Djava.library.path=" + directory.getPath().replace(" ", "_") + File.separator + "bin", "-cp", jarsDir + "*:" + jarsDir + "Pulsar.jar", "net.minecraft.client.main.Main", "-uuid", "N/A", "-version", "1.8.8", "--accessToken", "none", "--assetIndex", "1.8", "--gameDir", gameDir};
+            Logger.debug(exec);
 
-            Process process = Runtime.getRuntime().exec(cmd);
+            ProcessBuilder builder = new ProcessBuilder(exec.split(" "));
+            Process process = builder.start();
 
             String line;
 
@@ -90,9 +88,11 @@ public enum Launcher {
             while((line = new BufferedReader(new InputStreamReader(process.getErrorStream())).readLine()) != null) {
                 System.out.println(line);
             }
-        } catch(IOException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
+
+        this.running = false;
     }
 
 }

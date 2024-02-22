@@ -1,18 +1,17 @@
 package me.geuxy.utils.system;
 
+import lombok.RequiredArgsConstructor;
+
 import java.io.File;
 
+@RequiredArgsConstructor
 public enum OSUtil {
 
-    WINDOWS("AppData/Roaming/.minecraft/"),
-    MAC("Library/Application Support/minecraft/"),
-    LINUX(".minecraft/");
+    WINDOWS("AppData" + File.separator + "Roaming" + File.separator + ".minecraft" + File.separator),
+    MAC("Library" + File.separator + "Application Support" + File.separator + "minecraft" + File.separator),
+    LINUX(".minecraft" + File.separator);
 
     private final String directory;
-
-    OSUtil(String directory) {
-        this.directory = directory.replace("/", File.separator);
-    }
 
     public static OSUtil getOS() {
         String osName = System.getProperty("os.name").toLowerCase();
@@ -22,14 +21,6 @@ public enum OSUtil {
 
     public String getMinecraft() {
         return System.getProperty("user.home") + File.separator + directory;
-    }
-
-    public String getPulsar() {
-        return System.getProperty("user.home") + File.separator + directory.replace("minecraft", "pulsarlauncher").replace(".pulsarlauncher", "pulsarlauncher");
-    }
-
-    public static boolean isLinux() {
-        return System.getProperty("os.name").toLowerCase().contains("linux");
     }
 
 }

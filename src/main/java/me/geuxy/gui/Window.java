@@ -8,6 +8,7 @@ import me.geuxy.actions.LaunchAction;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 @Getter @Setter
 public class Window extends JFrame {
@@ -103,7 +104,7 @@ public class Window extends JFrame {
 
         this.repaint();
 
-        Launcher.INSTANCE.getConfig().load(Launcher.INSTANCE.getDirectory(), this);
+        Launcher.INSTANCE.getConfig().load(new File("config.json"), this);
 
         this.setVisible(true);
     }

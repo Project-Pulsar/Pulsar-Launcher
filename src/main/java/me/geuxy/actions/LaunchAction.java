@@ -7,6 +7,7 @@ import me.geuxy.gui.Window;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 @RequiredArgsConstructor
 public class LaunchAction implements ActionListener {
@@ -29,11 +30,25 @@ public class LaunchAction implements ActionListener {
             maximumRam = tempMinimumRam;
         }
 
-        Launcher.INSTANCE.getConfig().save(Launcher.INSTANCE.getDirectory(), minimumRam, maximumRam, window.isHide());
+        Launcher.INSTANCE.getConfig().save(new File("config.json"), minimumRam, maximumRam, window.isHide());
 
-        Launcher.INSTANCE.startClient(minimumRam, maximumRam);
+        new Thread(() -> Launcher.INSTANCE.startClient(getFixedRam()[0], getFixedRam()[1])).start();
 
         window.setVisible(true);
+    }
+
+    private int[] getFixedRam() {
+        int minimumRam = window.getMinimumRam();
+        int maximumRam = window.getMaximumRam();
+
+        if(minimumRam > maximumRam) {
+            int tempMinimumRam = minimumRam;
+
+            minimumRam = maximumRam;
+            maximumRam = tempMinimumRam;
+        }
+
+        return new int[] {minimumRam, maximumRam};
     }
 
 }

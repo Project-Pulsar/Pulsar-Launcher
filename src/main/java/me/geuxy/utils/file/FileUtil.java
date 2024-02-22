@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Scanner;
 
 public class FileUtil {
 
@@ -51,6 +52,23 @@ public class FileUtil {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String read(File file) {
+        try {
+            Scanner scanner = new Scanner(file);
+
+            String text = "";
+            while(scanner.hasNextLine()) {
+                text += scanner.nextLine();
+            }
+
+            return text;
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }
