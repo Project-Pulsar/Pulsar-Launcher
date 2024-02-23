@@ -3,7 +3,7 @@ package me.geuxy.library;
 import lombok.Getter;
 
 @Getter
-public class Library {
+public final class Library {
 
     private final String name, url;
     private final int bytes;

@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 @RequiredArgsConstructor
-public class LaunchAction implements ActionListener {
+public final class LaunchAction implements ActionListener {
 
     private final Window window;
 
@@ -20,17 +20,9 @@ public class LaunchAction implements ActionListener {
             window.setVisible(false);
         }
 
-        int minimumRam = window.getMinRam();
-        int maximumRam = window.getMaxRam();
+        int[] fixedRam = getFixedRam();
 
-        if(minimumRam > maximumRam) {
-            int tempMinimumRam = minimumRam;
-
-            minimumRam = maximumRam;
-            maximumRam = tempMinimumRam;
-        }
-
-        Launcher.getInstance().getConfigManager().save(new Config(window.getMinRam(), window.getMaxRam(), window.isHide()));
+        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], window.isHide()));
 
         new Thread(() -> Launcher.getInstance().startClient(getFixedRam())).start();
 

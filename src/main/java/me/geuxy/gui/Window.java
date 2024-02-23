@@ -12,7 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 @Getter @Setter
-public class Window extends JFrame {
+public final class Window extends JFrame {
 
     private final JPanel homePanel;
     private final JPanel settingsPanel;

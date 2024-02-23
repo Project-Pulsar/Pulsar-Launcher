@@ -5,8 +5,10 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
+/*
+ * Warning: Do NOT convert this into a record for "beauty", Gson does not support records in this scenario
+ */
+@Getter @RequiredArgsConstructor
 public final class Config {
 
     @SerializedName("minimum ram")
