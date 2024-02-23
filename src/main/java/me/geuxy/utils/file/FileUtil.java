@@ -2,6 +2,9 @@ package me.geuxy.utils.file;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import lombok.experimental.UtilityClass;
+import me.geuxy.library.Library;
+import me.geuxy.utils.console.Logger;
 
 import java.io.*;
 
@@ -12,6 +15,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
 
+@UtilityClass
 public class FileUtil {
 
     public static boolean download(String url, File file) {
@@ -54,9 +58,9 @@ public class FileUtil {
         }
     }
 
-    public static String read(File file) {
+    public static String read(String file) {
         try {
-            Scanner scanner = new Scanner(file);
+            Scanner scanner = new Scanner(new URL(file).openStream());
 
             String text = "";
             while(scanner.hasNextLine()) {
@@ -64,11 +68,37 @@ public class FileUtil {
             }
 
             return text;
-        } catch(FileNotFoundException e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
 
         return null;
+    }
+
+    /*
+     * Creates a directory and outputs the result
+     */
+    public static void createDirectory(File file) {
+        if(!file.exists()) {
+            if(file.mkdir()) {
+                Logger.info("Created new directory: " + file.getPath());
+
+            } else {
+                Logger.error("Failed to make directory: " + file.getPath());
+            }
+        }
+    }
+
+    /*
+     * Downloads a library by url and outputs the result
+     */
+    public static void downloadLibrary(Library library, File file) {
+        if(FileUtil.download(library.getUrl(), file)) {
+            System.out.println("Downloaded " + library.getName());
+
+        } else {
+            System.err.println("Failed to download " + library.getName());
+        }
     }
 
 }

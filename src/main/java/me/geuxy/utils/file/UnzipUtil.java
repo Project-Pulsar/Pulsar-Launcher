@@ -1,5 +1,7 @@
 package me.geuxy.utils.file;
 
+import lombok.experimental.UtilityClass;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -8,9 +10,10 @@ import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+@UtilityClass
 public class UnzipUtil {
 
-    public void unzip(String zipDirectory, String destDirectory) throws IOException {
+    public static void unzip(String zipDirectory, String destDirectory) throws IOException {
         File destDir = new File(destDirectory);
 
         if (!destDir.exists()) {

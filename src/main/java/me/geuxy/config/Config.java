@@ -1,39 +1,21 @@
 package me.geuxy.config;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import me.geuxy.gui.Window;
-import me.geuxy.utils.file.FileUtil;
-
-import java.io.File;
-
+@Getter
 @RequiredArgsConstructor
-public class Config {
+public final class Config {
 
-    private final Gson gson;
+    @SerializedName("minimum ram")
+    private final int minRam;
 
-    public void save(File directory, int minimumRam, int maximumRam, boolean hide) {
-        JsonObject json = new JsonObject();
+    @SerializedName("maximum ram")
+    private final int maxRam;
 
-        json.addProperty("Minimum Ram", minimumRam);
-        json.addProperty("Maximum Ram", maximumRam);
-        json.addProperty("Hide on launch", hide);
-
-        FileUtil.write(directory, gson.toJson(json));
-    }
-
-    public void load(File directory, Window window) {
-        if(!directory.exists()) {
-            this.save(directory, 1, 1, false);
-            return;
-        }
-
-        JsonObject json = FileUtil.readJson(directory);
-
-        window.setValues(json.get("Minimum Ram").getAsInt(), json.get("Maximum Ram").getAsInt(), json.get("Hide on launch").getAsBoolean());
-    }
+    @SerializedName("hide on launch")
+    private final boolean hide;
 
 }

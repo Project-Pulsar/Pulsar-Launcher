@@ -1,50 +1,54 @@
 package me.geuxy.library;
 
+import com.google.gson.Gson;
+
 import me.geuxy.utils.file.FileUtil;
 import me.geuxy.utils.console.Logger;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
-public class LibraryManager {
+public final class LibraryManager {
 
-    private final List<Library> libraries = new ArrayList<>();
+    private final Library[] libraries;
 
-    public void setupLibraries() {
-        try {
-            Scanner scanner = new Scanner(new URL("https://raw.githubusercontent.com/Geuxy/Pulsar/main/libraries.txt").openStream());
+    private final Gson gson;
 
-            libraries.clear();
+    public LibraryManager(Gson gson) {
+        this.gson = gson;
 
-            while(scanner.hasNextLine()) {
-                libraries.add(new Library(scanner.nextLine()));
-            }
-        } catch (IOException ignored) {
-        }
-
+        this.libraries = getRequiredLibraries();
     }
 
+    /*
+     * Deserializes JSON to library array
+     */
+    public Library[] getRequiredLibraries() {
+        String json = FileUtil.read("https://raw.githubusercontent.com/Project-Pulsar/Cloud/main/PulsarLauncher/libraries.json");
+        return gson.fromJson(json, Library[].class);
+    }
+
+    /*
+     * Checks if libraries aren't downloaded yet or were modified / corrupted
+     */
     public void addLibraries() {
-        File jarsDirectory = new File("jars");
+        File jarsDir = new File("jars");
 
-        this.createDirectory(jarsDirectory);
+        // Create /jars directory
+        FileUtil.createDirectory(jarsDir);
 
-        libraries.forEach(library -> {
-            File jar = new File(jarsDirectory, library.getName() + ".jar");
+        for(Library library : libraries) {
+            File jar = new File(jarsDir, library.getName() + ".jar");
 
-            boolean wrongSize = jar.length() != library.getBytes();
-
+            // If library does not exist, download it
             if(!jar.exists()) {
-                this.downloadLibrary(library, jar);
+                FileUtil.downloadLibrary(library, jar);
 
             } else {
-                if(wrongSize) {
+
+                // Corrupt jar check
+                if(jar.length() != library.getBytes()) {
                     if(jar.delete()) {
-                        this.downloadLibrary(library, jar);
+                        FileUtil.downloadLibrary(library, jar);
 
                     } else {
                         Logger.error("Failed to delete " + library.getName());
@@ -54,26 +58,6 @@ public class LibraryManager {
                     Logger.info("Found " + library.getName());
                 }
             }
-        });
-    }
-
-    private void createDirectory(File file) {
-        if(!file.exists()) {
-            if(file.mkdir()) {
-                Logger.info("Created new directory: " + file.getPath());
-
-            } else {
-                Logger.error("Failed to make directory: " + file.getPath());
-            }
-        }
-    }
-
-    private void downloadLibrary(Library library, File file) {
-        if(FileUtil.download(library.getUrl(), file)) {
-            System.out.println("Downloaded " + library.getName());
-
-        } else {
-            System.err.println("Failed to download " + library.getName());
         }
     }
 

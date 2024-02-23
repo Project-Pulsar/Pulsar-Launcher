@@ -3,11 +3,11 @@ package me.geuxy.actions;
 import lombok.RequiredArgsConstructor;
 
 import me.geuxy.Launcher;
+import me.geuxy.config.Config;
 import me.geuxy.gui.Window;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 @RequiredArgsConstructor
 public class LaunchAction implements ActionListener {
@@ -20,8 +20,8 @@ public class LaunchAction implements ActionListener {
             window.setVisible(false);
         }
 
-        int minimumRam = window.getMinimumRam();
-        int maximumRam = window.getMaximumRam();
+        int minimumRam = window.getMinRam();
+        int maximumRam = window.getMaxRam();
 
         if(minimumRam > maximumRam) {
             int tempMinimumRam = minimumRam;
@@ -30,16 +30,16 @@ public class LaunchAction implements ActionListener {
             maximumRam = tempMinimumRam;
         }
 
-        Launcher.INSTANCE.getConfig().save(new File("config.json"), minimumRam, maximumRam, window.isHide());
+        Launcher.getInstance().getConfigManager().save(new Config(window.getMinRam(), window.getMaxRam(), window.isHide()));
 
-        new Thread(() -> Launcher.INSTANCE.startClient(getFixedRam()[0], getFixedRam()[1])).start();
+        new Thread(() -> Launcher.getInstance().startClient(getFixedRam())).start();
 
         window.setVisible(true);
     }
 
     private int[] getFixedRam() {
-        int minimumRam = window.getMinimumRam();
-        int maximumRam = window.getMaximumRam();
+        int minimumRam = window.getMinRam();
+        int maximumRam = window.getMaxRam();
 
         if(minimumRam > maximumRam) {
             int tempMinimumRam = minimumRam;

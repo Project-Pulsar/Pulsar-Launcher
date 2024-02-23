@@ -5,10 +5,11 @@ import lombok.Setter;
 
 import me.geuxy.Launcher;
 import me.geuxy.actions.LaunchAction;
+import me.geuxy.config.Config;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.awt.event.ActionListener;
 
 @Getter @Setter
 public class Window extends JFrame {
@@ -21,8 +22,8 @@ public class Window extends JFrame {
 
     private final JCheckBox hideOnLaunch;
 
-    private int minimumRam = 1;
-    private int maximumRam = 1;
+    private int minRam = 1;
+    private int maxRam = 1;
 
     private boolean hide;
 
@@ -59,7 +60,7 @@ public class Window extends JFrame {
         JButton settingsButton = new JButton("Settings");
         settingsButton.setFocusPainted(false);
         settingsButton.setFont(font);
-        settingsButton.addActionListener(e -> setupSettings());
+        settingsButton.addActionListener(setupSettings());
         this.homePanel.add(settingsButton);
 
         JButton quitButton = new JButton("Quit");
@@ -79,11 +80,11 @@ public class Window extends JFrame {
         this.settingsPanel.add(new JLabel("Maximum Ram"));
 
         this.minimumRamSlider = new JSlider(1, 8);
-        this.minimumRamSlider.addChangeListener(e -> this.minimumRam = minimumRamSlider.getValue());
+        this.minimumRamSlider.addChangeListener(e -> this.minRam = minimumRamSlider.getValue());
         this.settingsPanel.add(minimumRamSlider);
 
         this.maximumRamSlider = new JSlider(1, 8);
-        this.maximumRamSlider.addChangeListener(e -> this.maximumRam = maximumRamSlider.getValue());
+        this.maximumRamSlider.addChangeListener(e -> this.maxRam = maximumRamSlider.getValue());
         this.settingsPanel.add(maximumRamSlider);
 
         this.hideOnLaunch = new JCheckBox("Hide on launch");
@@ -91,45 +92,50 @@ public class Window extends JFrame {
         this.settingsPanel.add(hideOnLaunch);
 
         Button test = new Button("Back");
-        test.addActionListener(e -> setupHome());
+        test.addActionListener(setupHome());
         this.settingsPanel.add(test);
 
         /*
          * Setup
          */
-        this.setupHome();
+        this.setupHome().actionPerformed(null);
 
         this.add(label);
         this.add(homePanel);
 
         this.repaint();
 
-        Launcher.INSTANCE.getConfig().load(new File("config.json"), this);
+        Launcher.getInstance().getConfigManager().load(this);
 
         this.setVisible(true);
     }
 
-    private void setupHome() {
-        this.remove(settingsPanel);
-        this.add(homePanel);
-        validate();
-        repaint();
-
+    private ActionListener setupHome() {
+        return e -> {
+            this.remove(settingsPanel);
+            this.add(homePanel);
+            validate();
+            repaint();
+        };
     }
 
-    private void setupSettings() {
-        this.remove(homePanel);
-        this.add(settingsPanel);
-        validate();
-        repaint();
+    private ActionListener setupSettings() {
+        return e -> {
+            this.remove(homePanel);
+            this.add(settingsPanel);
+            validate();
+            repaint();
+        };
     }
 
-    public void setValues(int minimumRam, int maximumRam, boolean hide) {
-        this.minimumRam = minimumRam;
-        this.maximumRam = maximumRam;
-        this.minimumRamSlider.setValue(minimumRam);
-        this.maximumRamSlider.setValue(maximumRam);
-        this.hide = hide;
+    public void setConfig(Config config) {
+        this.minRam = config.getMinRam();
+        this.maxRam = config.getMaxRam();
+
+        this.minimumRamSlider.setValue(minRam);
+        this.maximumRamSlider.setValue(maxRam);
+
+        this.hide = config.isHide();
         this.hideOnLaunch.setSelected(hide);
     }
 
