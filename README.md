@@ -1,2 +1,2 @@
 # Pulsar-Launcher
-launcher with aids
+Pulsar-Launcher is a simple and lightweight Minecraft Launcher for the client "Pulsar"
