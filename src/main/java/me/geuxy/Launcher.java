@@ -1,5 +1,6 @@
 package me.geuxy;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -7,11 +8,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import lombok.Getter;
 
 import me.geuxy.config.ConfigManager;
+import me.geuxy.gui.OutputWindow;
 import me.geuxy.gui.Window;
 import me.geuxy.library.LibraryManager;
 import me.geuxy.utils.console.Logger;
@@ -31,12 +33,18 @@ public final class Launcher {
 
     private boolean running;
 
+    private final OutputWindow outputWindow;
+
     public Launcher() {
         instance = this;
 
         this.gson = new GsonBuilder().setPrettyPrinting().create();
+
         this.libraryManager = new LibraryManager(this.gson);
         this.configManager = new ConfigManager(this.gson, new File("config.json"));
+        this.outputWindow = new OutputWindow();
+
+        Logger.info("Initializing window...");
 
         new Window();
     }
@@ -48,6 +56,8 @@ public final class Launcher {
                 return;
             }
             this.running = true;
+
+            this.outputWindow.clear();
 
             this.libraryManager.addLibraries();
             setupNatives();
@@ -71,11 +81,15 @@ public final class Launcher {
 
             String line;
 
-            while((line = (new BufferedReader(new InputStreamReader(process.getInputStream()))).readLine()) != null)
-                System.out.println(line);
+            while((line = (new BufferedReader(new InputStreamReader(process.getInputStream()))).readLine()) != null) {
+                Logger.info(line);
+                this.outputWindow.append(line);
+            }
 
-            while((line = (new BufferedReader(new InputStreamReader(process.getErrorStream()))).readLine()) != null)
-                System.out.println(line);
+            while((line = (new BufferedReader(new InputStreamReader(process.getErrorStream()))).readLine()) != null) {
+                Logger.error(line);
+                this.outputWindow.append(line);
+            }
 
             this.running = false;
         } catch(Throwable ex) {
@@ -112,6 +126,12 @@ public final class Launcher {
     }
 
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(new FlatDarkLaf());
+        } catch(UnsupportedLookAndFeelException e) {
+            throw new RuntimeException(e);
+        }
+
         SwingUtilities.invokeLater(Launcher::new);
     }
 

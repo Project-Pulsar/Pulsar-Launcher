@@ -1,21 +1,25 @@
 package me.geuxy.utils.console;
 
+import org.apache.logging.log4j.LogManager;
+
 public class Logger {
 
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+
     public static void debug(Object object) {
-        System.out.println("[PulsarLauncher/DEBUG] " + object);
+        logger.info(object);
     }
 
     public static void info(Object object) {
-        System.out.println("[PulsarLauncher/INFO] " + object);
+        logger.info(object);
     }
 
     public static void warn(Object object) {
-        System.out.println("[PulsarLauncher/WARNING] " + object);
+        logger.warn(object);
     }
 
     public static void error(Object object) {
-        System.err.println("[PulsarLauncher/ERROR] " + object);
+        logger.error(object);
     }
 
 }

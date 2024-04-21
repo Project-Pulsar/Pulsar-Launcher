@@ -7,12 +7,14 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 
 import lombok.Getter;
 
 import me.geuxy.Launcher;
 import me.geuxy.actions.LaunchAction;
 import me.geuxy.config.Config;
+import me.geuxy.utils.console.Logger;
 
 @Getter
 public final class Window extends JFrame {
@@ -20,8 +22,11 @@ public final class Window extends JFrame {
     private final JPanel homePanel;
     private final JPanel settingsPanel;
 
-    private final JSlider minimumRamSlider;
-    private final JSlider maximumRamSlider;
+    private final JLabel minLabel;
+    private final JLabel maxLabel;
+
+    private final JSlider minRamSlider;
+    private final JSlider maxRamSlider;
 
     private final JCheckBox hideOnLaunch;
 
@@ -33,59 +38,112 @@ public final class Window extends JFrame {
     public Window() {
         super("Pulsar Launcher");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(650, 350);
+        setSize(650, 370);
         setLocationRelativeTo(null);
         setLayout(new FlowLayout());
         setResizable(false);
-        JLabel label = new JLabel("Pulsar", SwingConstants.CENTER);
+
+        // Title label
+        JLabel title = new JLabel("Pulsar", SwingConstants.CENTER);
         try {
-            label.setFont(Font.createFont(0, ClassLoader.getSystemResourceAsStream("assets/kilton.otf")).deriveFont(165.0F));
+            title.setFont(Font.createFont(0, ClassLoader.getSystemResourceAsStream("assets/kilton.otf")).deriveFont(165.0F));
         } catch(Exception e) {
-            e.printStackTrace();
+            Logger.error(e.getMessage());
         }
 
+        // Home panel
         this.homePanel = new JPanel();
         this.homePanel.setPreferredSize(new Dimension(getWidth() - 10, 140));
-        this.homePanel.setLayout(new GridLayout(3, 1));
+        this.homePanel.setLayout(new GridLayout(4, 1));
+        this.homePanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
+
         Font font = new Font("Arial", Font.PLAIN, 20);
+
+        // Launch button
         JButton launchButton = new JButton("Launch");
         launchButton.setFocusPainted(false);
         launchButton.setFont(font);
         launchButton.addActionListener(new LaunchAction(this));
         this.homePanel.add(launchButton);
+
+        // Settings button
         JButton settingsButton = new JButton("Settings");
         settingsButton.setFocusPainted(false);
         settingsButton.setFont(font);
         settingsButton.addActionListener(setupSettings());
         this.homePanel.add(settingsButton);
+
+        // Settings button
+        JButton outputButton = new JButton("Output");
+        outputButton.setFocusPainted(false);
+        outputButton.setFont(font);
+        outputButton.addActionListener(e -> Launcher.getInstance().getOutputWindow().setVisible(true));
+        this.homePanel.add(outputButton);
+
+        // Quit button
         JButton quitButton = new JButton("Quit");
         quitButton.setFocusPainted(false);
         quitButton.setFont(font);
         quitButton.addActionListener(e -> System.exit(0));
         this.homePanel.add(quitButton);
+
+        // Settings panel
         this.settingsPanel = new JPanel();
         this.settingsPanel.setPreferredSize(new Dimension(getWidth() - 10, 140));
         this.settingsPanel.setLayout(new GridLayout(3, 2));
-        this.settingsPanel.add(new JLabel("Minimum Ram"));
-        this.settingsPanel.add(new JLabel("Maximum Ram"));
-        this.minimumRamSlider = new JSlider(1, 8);
-        this.minimumRamSlider.addChangeListener(e -> this.minRam = this.minimumRamSlider.getValue());
-        this.settingsPanel.add(this.minimumRamSlider);
-        this.maximumRamSlider = new JSlider(1, 8);
-        this.maximumRamSlider.addChangeListener(e -> this.maxRam = this.maximumRamSlider.getValue());
-        this.settingsPanel.add(this.maximumRamSlider);
+        this.settingsPanel.add(minLabel = new JLabel(getMinRamText(), JLabel.CENTER));
+        this.settingsPanel.add(maxLabel = new JLabel(getMaxRamText(), JLabel.CENTER));
+
+        // Minimum ram slider
+        this.minRamSlider = new JSlider(1, 8);
+        this.minRamSlider.addChangeListener(onMinRamChange());
+        this.settingsPanel.add(this.minRamSlider);
+
+        // Maximum ram slider
+        this.maxRamSlider = new JSlider(1, 8);
+        this.maxRamSlider.addChangeListener(onMaxRamChange());
+        this.settingsPanel.add(this.maxRamSlider);
+
+        // Hide on launch checkbox
         this.hideOnLaunch = new JCheckBox("Hide on launch");
         this.hideOnLaunch.addActionListener(e -> this.hide = !this.hide);
         this.settingsPanel.add(this.hideOnLaunch);
-        Button test = new Button("Back");
-        test.addActionListener(setupHome());
-        this.settingsPanel.add(test);
+
+        // Back Button
+        JButton backButton = new JButton("Back");
+        backButton.addActionListener(setupHome());
+        this.settingsPanel.add(backButton);
+
+        // Set panel to home panel
         setupHome().actionPerformed(null);
-        add(label);
+        add(title);
         add(this.homePanel);
-        repaint();
+
         Launcher.getInstance().getConfigManager().load(this);
+
         setVisible(true);
+    }
+
+    private ChangeListener onMinRamChange() {
+        return e -> {
+            this.minRam = minRamSlider.getValue();
+            this.minLabel.setText(getMinRamText());
+        };
+    }
+
+    private ChangeListener onMaxRamChange() {
+        return e -> {
+            this.maxRam = maxRamSlider.getValue();
+            this.maxLabel.setText(getMaxRamText());
+        };
+    }
+
+    private String getMinRamText() {
+        return "Minimum Ram (" + minRam + "GB)";
+    }
+
+    private String getMaxRamText() {
+        return "Maximum Ram (" + maxRam + "GB)";
     }
 
     private ActionListener setupHome() {
@@ -106,13 +164,15 @@ public final class Window extends JFrame {
         };
     }
 
-    public void setConfig(Config config) {
+    public void loadConfig(Config config) {
         this.minRam = config.getMinRam();
         this.maxRam = config.getMaxRam();
-        this.minimumRamSlider.setValue(this.minRam);
-        this.maximumRamSlider.setValue(this.maxRam);
+        this.minRamSlider.setValue(this.minRam);
+        this.maxRamSlider.setValue(this.maxRam);
         this.hide = config.isHide();
         this.hideOnLaunch.setSelected(this.hide);
+        onMinRamChange().stateChanged(null);
+        onMaxRamChange().stateChanged(null);
     }
 
 }

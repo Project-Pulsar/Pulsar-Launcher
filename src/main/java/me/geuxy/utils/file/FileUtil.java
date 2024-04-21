@@ -45,7 +45,7 @@ public final class FileUtil {
             json = (JsonObject) new JsonParser().parse(reader);
 
         } catch(Exception e) {
-            e.printStackTrace();
+            Logger.error(e.getMessage());
         }
         return json;
     }
@@ -57,7 +57,7 @@ public final class FileUtil {
             writer.close();
 
         } catch(Exception e) {
-            e.printStackTrace();
+            Logger.error(e.getMessage());
         }
     }
 
@@ -72,7 +72,7 @@ public final class FileUtil {
 
             return text;
         } catch(IOException e) {
-            e.printStackTrace();
+            Logger.error(e.getMessage());
         }
 
         return null;
@@ -97,10 +97,10 @@ public final class FileUtil {
      */
     public static void downloadLibrary(Library library, File file) {
         if(FileUtil.download(library.getUrl(), file)) {
-            System.out.println("Downloaded " + library.getName());
+            Logger.info("Downloaded " + library.getName());
 
         } else {
-            System.err.println("Failed to download " + library.getName());
+            Logger.info("Failed to download " + library.getName());
         }
     }
 

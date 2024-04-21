@@ -15,6 +15,9 @@ public final class LibraryManager {
 
     public LibraryManager(Gson gson) {
         this.gson = gson;
+
+        Logger.info("Finding libraries...");
+
         this.libraries = getRequiredLibraries();
     }
 
