@@ -5,10 +5,11 @@ import lombok.Getter;
 @Getter
 public final class Library {
 
-    private final String name, url;
+    private final String name;
+    private final String url;
+
     private final int bytes;
 
-    // TODO: Improve with gson
     public Library(String line) {
         String[] info = line.split("\\|");
 

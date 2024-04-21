@@ -1,17 +1,20 @@
 package me.geuxy.gui;
 
+import java.awt.Button;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionListener;
+import javax.swing.*;
+
 import lombok.Getter;
-import lombok.Setter;
 
 import me.geuxy.Launcher;
 import me.geuxy.actions.LaunchAction;
 import me.geuxy.config.Config;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-
-@Getter @Setter
+@Getter
 public final class Window extends JFrame {
 
     private final JPanel homePanel;
@@ -29,91 +32,66 @@ public final class Window extends JFrame {
 
     public Window() {
         super("Pulsar Launcher");
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setSize(650, 350);
-        this.setLocationRelativeTo(null);
-        this.setLayout(new FlowLayout());
-        this.setResizable(false);
-
-        JLabel label = new JLabel("Pulsar", JLabel.CENTER);
-
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setSize(650, 350);
+        setLocationRelativeTo(null);
+        setLayout(new FlowLayout());
+        setResizable(false);
+        JLabel label = new JLabel("Pulsar", SwingConstants.CENTER);
         try {
-            label.setFont(Font.createFont(Font.TRUETYPE_FONT, ClassLoader.getSystemResource("assets/kilton.otf").openStream()).deriveFont(165F));
-        } catch(Exception ignored) {
+            label.setFont(Font.createFont(0, ClassLoader.getSystemResourceAsStream("assets/kilton.otf")).deriveFont(165.0F));
+        } catch(Exception e) {
+            e.printStackTrace();
         }
 
-        /*
-         * Home
-         */
         this.homePanel = new JPanel();
-        this.homePanel.setPreferredSize(new Dimension(this.getWidth() - 10, 140));
+        this.homePanel.setPreferredSize(new Dimension(getWidth() - 10, 140));
         this.homePanel.setLayout(new GridLayout(3, 1));
-
         Font font = new Font("Arial", Font.PLAIN, 20);
-
         JButton launchButton = new JButton("Launch");
         launchButton.setFocusPainted(false);
         launchButton.setFont(font);
         launchButton.addActionListener(new LaunchAction(this));
         this.homePanel.add(launchButton);
-
         JButton settingsButton = new JButton("Settings");
         settingsButton.setFocusPainted(false);
         settingsButton.setFont(font);
         settingsButton.addActionListener(setupSettings());
         this.homePanel.add(settingsButton);
-
         JButton quitButton = new JButton("Quit");
         quitButton.setFocusPainted(false);
         quitButton.setFont(font);
         quitButton.addActionListener(e -> System.exit(0));
         this.homePanel.add(quitButton);
-
-        /*
-         * Settings
-         */
         this.settingsPanel = new JPanel();
-        this.settingsPanel.setPreferredSize(new Dimension(this.getWidth() - 10, 140));
+        this.settingsPanel.setPreferredSize(new Dimension(getWidth() - 10, 140));
         this.settingsPanel.setLayout(new GridLayout(3, 2));
-
         this.settingsPanel.add(new JLabel("Minimum Ram"));
         this.settingsPanel.add(new JLabel("Maximum Ram"));
-
         this.minimumRamSlider = new JSlider(1, 8);
-        this.minimumRamSlider.addChangeListener(e -> this.minRam = minimumRamSlider.getValue());
-        this.settingsPanel.add(minimumRamSlider);
-
+        this.minimumRamSlider.addChangeListener(e -> this.minRam = this.minimumRamSlider.getValue());
+        this.settingsPanel.add(this.minimumRamSlider);
         this.maximumRamSlider = new JSlider(1, 8);
-        this.maximumRamSlider.addChangeListener(e -> this.maxRam = maximumRamSlider.getValue());
-        this.settingsPanel.add(maximumRamSlider);
-
+        this.maximumRamSlider.addChangeListener(e -> this.maxRam = this.maximumRamSlider.getValue());
+        this.settingsPanel.add(this.maximumRamSlider);
         this.hideOnLaunch = new JCheckBox("Hide on launch");
-        this.hideOnLaunch.addActionListener(e -> hide = !hide);
-        this.settingsPanel.add(hideOnLaunch);
-
+        this.hideOnLaunch.addActionListener(e -> this.hide = !this.hide);
+        this.settingsPanel.add(this.hideOnLaunch);
         Button test = new Button("Back");
         test.addActionListener(setupHome());
         this.settingsPanel.add(test);
-
-        /*
-         * Setup
-         */
-        this.setupHome().actionPerformed(null);
-
-        this.add(label);
-        this.add(homePanel);
-
-        this.repaint();
-
+        setupHome().actionPerformed(null);
+        add(label);
+        add(this.homePanel);
+        repaint();
         Launcher.getInstance().getConfigManager().load(this);
-
-        this.setVisible(true);
+        setVisible(true);
     }
 
     private ActionListener setupHome() {
         return e -> {
-            this.remove(settingsPanel);
-            this.add(homePanel);
+            remove(this.settingsPanel);
+            add(this.homePanel);
             validate();
             repaint();
         };
@@ -121,8 +99,8 @@ public final class Window extends JFrame {
 
     private ActionListener setupSettings() {
         return e -> {
-            this.remove(homePanel);
-            this.add(settingsPanel);
+            remove(this.homePanel);
+            add(this.settingsPanel);
             validate();
             repaint();
         };
@@ -131,12 +109,10 @@ public final class Window extends JFrame {
     public void setConfig(Config config) {
         this.minRam = config.getMinRam();
         this.maxRam = config.getMaxRam();
-
-        this.minimumRamSlider.setValue(minRam);
-        this.maximumRamSlider.setValue(maxRam);
-
+        this.minimumRamSlider.setValue(this.minRam);
+        this.maximumRamSlider.setValue(this.maxRam);
         this.hide = config.isHide();
-        this.hideOnLaunch.setSelected(hide);
+        this.hideOnLaunch.setSelected(this.hide);
     }
 
 }
