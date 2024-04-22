@@ -7,7 +7,7 @@ import javax.swing.*;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 
-public class AboutPanel extends JPanel {
+public final class AboutPanel extends JPanel {
 
     // hardcode this because why not :)
     private final String[][] credits = {

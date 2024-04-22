@@ -16,17 +16,17 @@ public final class LaunchAction implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if(this.window.isHide()) {
+        if(this.window.getSettings().isHide()) {
             this.window.setVisible(false);
         }
 
         int[] fixedRam = getFixedRam();
 
-        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], this.window.isHide(), this.window.isSingleThread()));
+        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], this.window.getSettings().isHide(), this.window.getSettings().isSingleThread()));
 
         Runnable runnable = () -> Launcher.getInstance().startClient(getFixedRam());
 
-        if(window.isSingleThread()) {
+        if(window.getSettings().isSingleThread()) {
             runnable.run();
 
         } else {
@@ -37,8 +37,8 @@ public final class LaunchAction implements ActionListener {
     }
 
     private int[] getFixedRam() {
-        int min = this.window.getMinRam();
-        int max = this.window.getMaxRam();
+        int min = this.window.getSettings().getMinRam();
+        int max = this.window.getSettings().getMaxRam();
 
         if(min > max) {
             int tempMin = min;
