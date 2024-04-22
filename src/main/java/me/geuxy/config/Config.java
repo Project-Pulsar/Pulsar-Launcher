@@ -1,8 +1,10 @@
 package me.geuxy.config;
 
 import com.google.gson.annotations.SerializedName;
+import lombok.Getter;
 
 // Do NOT convert to record because GSON will fail to set the values properly
+@Getter
 public final class Config {
 
     @SerializedName("minimum ram")
@@ -14,22 +16,14 @@ public final class Config {
     @SerializedName("hide on launch")
     private final boolean hide;
 
-    public Config(int minRam, int maxRam, boolean hide) {
+    @SerializedName("single threaded")
+    private final boolean singleThreaded;
+
+    public Config(int minRam, int maxRam, boolean hide, boolean singleThreaded) {
         this.minRam = minRam;
         this.maxRam = maxRam;
         this.hide = hide;
-    }
-
-    public int getMinRam() {
-        return this.minRam;
-    }
-
-    public int getMaxRam() {
-        return this.maxRam;
-    }
-
-    public boolean isHide() {
-        return this.hide;
+        this.singleThreaded = singleThreaded;
     }
 
 }

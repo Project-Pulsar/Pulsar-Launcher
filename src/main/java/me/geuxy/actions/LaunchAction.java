@@ -22,11 +22,16 @@ public final class LaunchAction implements ActionListener {
 
         int[] fixedRam = getFixedRam();
 
-        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], this.window.isHide()));
+        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], this.window.isHide(), this.window.isSingleThread()));
 
-        new Thread(() -> Launcher.getInstance().startClient(getFixedRam())).start();
+        Runnable runnable = () -> Launcher.getInstance().startClient(getFixedRam());
 
-        Runtime.getRuntime().gc();
+        if(window.isSingleThread()) {
+            runnable.run();
+
+        } else {
+            new Thread(runnable).start();
+        }
 
         this.window.setVisible(true);
     }
@@ -40,7 +45,7 @@ public final class LaunchAction implements ActionListener {
             min = max;
             max = tempMin;
         }
-        return new int[]{min, max};
+        return new int[] {min, max};
     }
 
 }

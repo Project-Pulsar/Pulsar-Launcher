@@ -34,11 +34,11 @@ public final class LibraryManager {
             File jar = new File(jarsDir, library.getName() + ".jar");
 
             if(!jar.exists()) {
-                FileUtil.downloadLibrary(library, jar);
+                FileUtil.download(library.getUrl(), jar);
 
             } else if(jar.length() != library.getBytes()) {
                 if(jar.delete()) {
-                    FileUtil.downloadLibrary(library, jar);
+                    FileUtil.download(library.getUrl(), jar);
 
                 } else {
                     Logger.error("Failed to delete " + library.getName());

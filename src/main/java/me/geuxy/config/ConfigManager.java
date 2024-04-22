@@ -15,7 +15,7 @@ public record ConfigManager(Gson gson, File file) {
 
     public void load(Window window) {
         if(!this.file.exists())
-            save(new Config(1, 2, false));
+            save(new Config(1, 2, false, false));
 
         window.loadConfig(this.gson.fromJson(FileUtil.readJson(this.file), Config.class));
     }

@@ -7,15 +7,14 @@ import com.google.gson.GsonBuilder;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.stream.Stream;
 import javax.swing.*;
 
 import lombok.Getter;
 
+import me.geuxy.api.GithubAPI;
 import me.geuxy.config.ConfigManager;
-import me.geuxy.gui.OutputWindow;
 import me.geuxy.gui.Window;
 import me.geuxy.library.LibraryManager;
 import me.geuxy.utils.console.Logger;
@@ -28,6 +27,7 @@ public final class Launcher {
     @Getter
     private static Launcher instance;
 
+    private final GithubAPI githubAPI;
     private final LibraryManager libraryManager;
     private final ConfigManager configManager;
 
@@ -35,20 +35,23 @@ public final class Launcher {
 
     private boolean running;
 
-    private final OutputWindow outputWindow;
+    private final Window window;
+
+    private final String version;
 
     public Launcher() {
         instance = this;
 
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.version = "1.2.0-stable";
 
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.githubAPI = new GithubAPI();
         this.libraryManager = new LibraryManager(this.gson);
         this.configManager = new ConfigManager(this.gson, new File("config.json"));
-        this.outputWindow = new OutputWindow();
 
         Logger.info("Initializing window...");
 
-        new Window();
+        this.window = new Window();
     }
 
     public void startClient(int[] ram) {
@@ -59,7 +62,7 @@ public final class Launcher {
             }
             this.running = true;
 
-            this.outputWindow.clear();
+            this.window.getOutput().clear();
 
             this.libraryManager.addLibraries();
             setupNatives();
@@ -85,12 +88,12 @@ public final class Launcher {
 
             while((line = (new BufferedReader(new InputStreamReader(process.getInputStream()))).readLine()) != null) {
                 Logger.info(line);
-                this.outputWindow.append(line);
+                this.window.getOutput().append(line);
             }
 
             while((line = (new BufferedReader(new InputStreamReader(process.getErrorStream()))).readLine()) != null) {
                 Logger.error(line);
-                this.outputWindow.append(line);
+                this.window.getOutput().append(line);
             }
 
             this.running = false;
@@ -99,31 +102,19 @@ public final class Launcher {
         }
     }
 
-    private void setupNatives() throws IOException {
+    private void setupNatives() {
         File binDirectory = new File("bin");
         File binZip = new File("bin.zip");
 
         if(!binDirectory.exists()) {
-            if(FileUtil.download("https://github.com/Project-Pulsar/Cloud/raw/main/PulsarLauncher/bin/" + OSHelper.getOSName() + ".zip", binZip)) {
-                Logger.info("Downloaded natives");
-
-                FileUtil.unzip(binZip.getPath(), binDirectory.getPath());
-
-                Logger.info("Unzipped natives");
-
-            } else {
-                Logger.error("Failed to download natives");
-            }
-
+            FileUtil.download(githubAPI.getNativesByOS(), binZip);
+            FileUtil.unzip(binZip.getPath(), binDirectory.getPath());
         } else {
             Logger.info("Found natives");
         }
 
-        if(binZip.delete()) {
-            Logger.info("Deleted bin zip folder");
-
-        } else {
-            Logger.error("Failed to delete bin zip folder");
+        if(binZip.exists()) {
+            binZip.delete();
         }
     }
 
@@ -132,10 +123,9 @@ public final class Launcher {
             try {
                 UIManager.setLookAndFeel(new FlatDarkLaf());
             } catch(UnsupportedLookAndFeelException e) {
-                throw new RuntimeException(e);
+                Logger.error(e.getMessage());
             }
         }
-
         SwingUtilities.invokeLater(Launcher::new);
     }
 
