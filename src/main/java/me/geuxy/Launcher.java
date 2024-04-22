@@ -1,6 +1,7 @@
 package me.geuxy;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -8,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.stream.Stream;
 import javax.swing.*;
 
 import lombok.Getter;
@@ -126,10 +128,12 @@ public final class Launcher {
     }
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(new FlatDarkLaf());
-        } catch(UnsupportedLookAndFeelException e) {
-            throw new RuntimeException(e);
+        if(!Stream.of(args).toList().contains("--noflatlaf")) {
+            try {
+                UIManager.setLookAndFeel(new FlatDarkLaf());
+            } catch(UnsupportedLookAndFeelException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         SwingUtilities.invokeLater(Launcher::new);
