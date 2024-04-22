@@ -9,6 +9,16 @@ import java.awt.*;
 
 public class AboutPanel extends JPanel {
 
+    // hardcode this because why not :)
+    private final String[][] credits = {
+        {"Geuxy", "Owner"},
+        {"Kolotheegg", "Developer"},
+        {"Tabio", "Old Developer"},
+        {"Liticane", "External Developer"},
+        {"MoonX Devs", "External Developers"},
+        {"FelixH2012", "External Developer"}
+    };
+
     public AboutPanel() {
         this.setLayout(new BorderLayout());
         this.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
@@ -29,22 +39,15 @@ public class AboutPanel extends JPanel {
         };
         news.setEditorKit(new HTMLEditorKit());
 
-        // hardcode this because why not :)
         StringBuilder pulsar = new StringBuilder("Pulsar is a utility mod for minecraft providing high customizability, performance, stability, and bypasses to dominate most clients and anti-cheats with ease.<br>");
 
-        for(String s : new String[] {
-            "<b>Credits</b>",
-            "Geuxy - Owner",
-            "Kolotheegg - Developer",
-            "Tabio - Old Developer",
-            "Liticane - External Developer",
-            "MoonX devs - External Developers (for font renderer)",
-            "FelixH2012 - External Developer (for lambda event system)"
-        }) {
-            pulsar.append("<br>").append(s);
+        pulsar.append("<br><b>Credits:</b><br>");
+
+        for(String[] s : credits) {
+            pulsar.append("<b>").append(s[0]).append("</b> - ").append(s[1]).append("<br>");
         }
 
-        pulsar.append("<br><br><b>Launcher Version:</b> ").append(Launcher.getInstance().getVersion());
+        pulsar.append("<br><b>Launcher Version:</b> ").append(Launcher.getInstance().getVersion());
 
         news.setText(pulsar.toString());
 
