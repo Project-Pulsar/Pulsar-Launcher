@@ -15,27 +15,34 @@ public final class LaunchAction implements ActionListener {
         this.window = window;
     }
 
+    /*
+     * Action performed after the launch button is interacted with
+     */
+    @Override
     public void actionPerformed(ActionEvent e) {
-        if(this.window.getSettings().isHide()) {
-            this.window.setVisible(false);
-        }
-
         int[] fixedRam = getFixedRam();
 
-        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], this.window.getSettings().isHide(), this.window.getSettings().isSingleThread()));
+        boolean singleThreaded = window.getSettings().isSingleThread();
+        boolean hide = window.getSettings().isHide();
+        String mcPath = window.getSettings().getMcPath().getText();
+
+        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], mcPath, hide, singleThreaded));
 
         Runnable runnable = () -> Launcher.getInstance().startClient(getFixedRam());
 
-        if(window.getSettings().isSingleThread()) {
+        if(singleThreaded) {
             runnable.run();
 
         } else {
             new Thread(runnable).start();
         }
-
-        this.window.setVisible(true);
     }
 
+    /**
+     * Get fixed RAM values (fixes min from being larger than max)
+     *
+     * @return fixed RAM values
+     */
     private int[] getFixedRam() {
         int min = this.window.getSettings().getMinRam();
         int max = this.window.getSettings().getMaxRam();

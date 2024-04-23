@@ -4,13 +4,20 @@ import com.google.gson.Gson;
 
 import java.io.File;
 
+import me.geuxy.Launcher;
 import me.geuxy.utils.console.Logger;
 import me.geuxy.utils.file.FileUtil;
 
 public final class LibraryManager {
 
+    /*
+     * List of required libraries
+     */
     private final Library[] libraries;
 
+    /*
+     * GSON object for deserializing
+     */
     private final Gson gson;
 
     public LibraryManager(Gson gson) {
@@ -21,12 +28,17 @@ public final class LibraryManager {
         this.libraries = getRequiredLibraries();
     }
 
+    /*
+     * Get required libraries from JSON
+     */
     public Library[] getRequiredLibraries() {
-        String json = FileUtil.read("https://raw.githubusercontent.com/Project-Pulsar/Cloud/main/PulsarLauncher/libraries.json");
-        return this.gson.fromJson(json, Library[].class);
+        return this.gson.fromJson(Launcher.getInstance().getGithubAPI().getLibrariesJson(), Library[].class);
     }
 
-    public void addLibraries() {
+    /*
+     * Download and validate libraries
+     */
+    public void setupLibraries() {
         File jarsDir = new File("jars");
         FileUtil.createDirectory(jarsDir);
 
@@ -37,12 +49,9 @@ public final class LibraryManager {
                 FileUtil.download(library.getUrl(), jar);
 
             } else if(jar.length() != library.getBytes()) {
-                if(jar.delete()) {
-                    FileUtil.download(library.getUrl(), jar);
+                jar.delete();
+                FileUtil.download(library.getUrl(), jar);
 
-                } else {
-                    Logger.error("Failed to delete " + library.getName());
-                }
             } else {
                 Logger.info("Found " + library.getName());
             }

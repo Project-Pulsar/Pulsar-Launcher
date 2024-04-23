@@ -6,6 +6,7 @@ import java.io.File;
 
 import me.geuxy.gui.Window;
 import me.geuxy.utils.file.FileUtil;
+import me.geuxy.utils.system.OSHelper;
 
 public record ConfigManager(Gson gson, File file) {
 
@@ -15,7 +16,7 @@ public record ConfigManager(Gson gson, File file) {
 
     public void load(Window window) {
         if(!this.file.exists())
-            save(new Config(1, 2, false, false));
+            save(new Config(1, 2, OSHelper.getOS().getMinecraft(), false, false));
 
         window.getSettings().updateSettings(this.gson.fromJson(FileUtil.readJson(this.file), Config.class));
     }

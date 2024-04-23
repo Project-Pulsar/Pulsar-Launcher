@@ -1,4 +1,4 @@
-package me.geuxy.gui;
+package me.geuxy.gui.panels.main;
 
 import me.geuxy.Launcher;
 import me.geuxy.utils.render.ImageUtil;
@@ -39,7 +39,7 @@ public final class AboutPanel extends JPanel {
         };
         news.setEditorKit(new HTMLEditorKit());
 
-        StringBuilder pulsar = new StringBuilder("Pulsar is a utility mod for minecraft providing high customizability, performance, stability, and bypasses to dominate most clients and anti-cheats with ease.<br>");
+        StringBuilder pulsar = new StringBuilder("Pulsar is a utility mod for minecraft providing high customizability, performance,<br> stability, and bypasses to dominate most anti-cheats with ease.<br>");
 
         pulsar.append("<br><b>Credits:</b><br>");
 

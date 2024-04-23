@@ -37,11 +37,13 @@ public final class Launcher {
 
     private final Window window;
 
+    private final String name;
     private final String version;
 
     public Launcher() {
         instance = this;
 
+        this.name = "Pulsar Launcher";
         this.version = "1.2.0-stable";
 
         this.gson = new GsonBuilder().setPrettyPrinting().create();
@@ -54,21 +56,32 @@ public final class Launcher {
         this.window = new Window();
     }
 
+    /*
+     * Starts up Minecraft
+     */
     public void startClient(int[] ram) {
         try {
+            // Prevent multiple game instances
             if(this.running) {
                 Logger.warn("Already running");
                 return;
             }
+
             this.running = true;
 
+            // Clear console output
             this.window.getOutput().clear();
 
-            this.libraryManager.addLibraries();
-            setupNatives();
+            if(window.getSettings().isHide()) {
+                this.window.setVisible(false);
+            }
+
+            // download and validate the libraries and natives
+            this.libraryManager.setupLibraries();
+            this.setupNatives();
 
             String jarsDir = "jars" + File.separator;
-            String gameDir = OSHelper.getOS().getMinecraft();
+            String gameDir = this.window.getSettings().getMcPath().getText();
             String minRam = "-Xms" + ram[0] + "G";
             String maxRam = "-Xmx" + ram[1] + "G";
 
@@ -79,8 +92,10 @@ public final class Launcher {
             String separator = (OSHelper.getOS() == OSHelper.WINDOWS) ? ";" : ":";
             String exec = "java " + minRam + " " + maxRam + " -Djava.library.path=bin -cp " + jarsDir + "Pulsar.jar" + separator + jarsDir + "* net.minecraft.client.main.Main -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir + " --width 800 --height 500";
 
+            // Execute the game
             Logger.debug(exec);
 
+            // Get games console output
             ProcessBuilder builder = new ProcessBuilder(exec.split(" "));
             Process process = builder.start();
 
@@ -100,8 +115,13 @@ public final class Launcher {
         } catch(Throwable ex) {
             throw new RuntimeException(ex);
         }
+
+        this.window.setVisible(true);
     }
 
+    /*
+     * Downloads natives depending on the users OS
+     */
     private void setupNatives() {
         File binDirectory = new File("bin");
         File binZip = new File("bin.zip");
@@ -118,6 +138,9 @@ public final class Launcher {
         }
     }
 
+    /*
+     * Start launcher
+     */
     public static void main(String[] args) {
         if(!Stream.of(args).toList().contains("--noflatlaf")) {
             try {

@@ -1,17 +1,17 @@
-package me.geuxy.gui;
+package me.geuxy.gui.panels.main;
 
 import me.geuxy.Launcher;
 import me.geuxy.actions.LaunchAction;
+import me.geuxy.gui.Window;
 import me.geuxy.utils.file.FileUtil;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 
-public class HomePanel extends JPanel {
+public final class HomePanel extends JPanel {
 
-    public HomePanel() {
+    public HomePanel(Window window) {
         this.setLayout(new BorderLayout(10, 10));
         this.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
@@ -40,7 +40,7 @@ public class HomePanel extends JPanel {
         JButton launchButton = new JButton("Launch");
         launchButton.setFocusPainted(false);
         launchButton.setFont(new Font("Arial", Font.PLAIN, 20));
-        launchButton.addActionListener(new LaunchAction(Launcher.getInstance().getWindow()));
+        launchButton.addActionListener(new LaunchAction(window));
 
         this.add(launchButton, BorderLayout.SOUTH);
     }

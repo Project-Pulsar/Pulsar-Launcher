@@ -20,8 +20,11 @@ import me.geuxy.utils.console.Logger;
 @UtilityClass
 public final class FileUtil {
 
-    /*
+    /**
+     * Downloads a file from the given url
      *
+     * @param url link to download file from
+     * @param file location to save file to
      */
     public static void download(String url, File file) {
         try {
@@ -37,6 +40,13 @@ public final class FileUtil {
         }
     }
 
+    /**
+     * Reads a JSON file and for deserialization
+     *
+     * @param file JSON file location
+     *
+     * @return deserialized JSON
+     */
     public static JsonObject readJson(File file) {
         JsonObject json = null;
 
@@ -50,6 +60,12 @@ public final class FileUtil {
         return json;
     }
 
+    /**
+     * Creates and writes a file
+     *
+     * @param file location to save file
+     * @param output text to be written inside the file
+     */
     public static void write(File file, String output) {
         try {
             PrintWriter writer = new PrintWriter(new FileWriter(file));
@@ -61,13 +77,28 @@ public final class FileUtil {
         }
     }
 
-    public static String read(String file) {
-        return read(file, "");
+    /**
+     * Reads the contents of a file from url
+     *
+     * @param url link to read from
+     *
+     * @return contents from file that was read
+     */
+    public static String read(String url) {
+        return read(url, "");
     }
 
-    public static String read(String file, String separator) {
+    /**
+     * Reads the contents of a file from url
+     *
+     * @param url link to read from
+     * @param separator string to separate each line
+     *
+     * @return contents from file that was read
+     */
+    public static String read(String url, String separator) {
         try {
-            Scanner scanner = new Scanner(new URL(file).openStream());
+            Scanner scanner = new Scanner(new URL(url).openStream());
 
             String text = "";
             while(scanner.hasNextLine()) {
@@ -82,8 +113,10 @@ public final class FileUtil {
         return null;
     }
 
-    /*
-     * Creates a directory and outputs the result
+    /**
+     * Creates a directory
+     *
+     * @param file directory location to be created
      */
     public static void createDirectory(File file) {
         if(!file.exists()) {
@@ -99,8 +132,11 @@ public final class FileUtil {
         }
     }
 
-    /*
-     * Unzips a zip file (a compressed file with ".zip" extension)
+    /**
+     * Unzips a compressed zip file
+     *
+     * @param zipDir zip file location to unzip
+     * @param destination location to keep unzipped folder
      */
     public static void unzip(String zipDir, String destination) {
         createDirectory(new File(destination));

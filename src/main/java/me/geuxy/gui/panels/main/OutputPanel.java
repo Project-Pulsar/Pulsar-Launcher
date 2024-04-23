@@ -1,4 +1,4 @@
-package me.geuxy.gui;
+package me.geuxy.gui.panels.main;
 
 import javax.swing.*;
 import java.awt.*;

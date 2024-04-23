@@ -5,23 +5,37 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import javafx.scene.control.SelectionMode;
-
 import lombok.Getter;
 
 import me.geuxy.Launcher;
+import me.geuxy.gui.panels.main.AboutPanel;
+import me.geuxy.gui.panels.main.HomePanel;
+import me.geuxy.gui.panels.main.OutputPanel;
+import me.geuxy.gui.panels.main.SettingsPanel;
+import me.geuxy.gui.panels.other.SidePanel;
 import me.geuxy.utils.render.ImageUtil;
 
 @Getter
 public final class Window extends JFrame implements ListSelectionListener {
 
+    /*
+     * Main panels
+     */
     private final HomePanel home;
     private final AboutPanel about;
     private final SettingsPanel settings;
     private final OutputPanel output;
 
-    private final JList list;
+    /*
+     * Side panel
+     */
+    private final SidePanel sidePanel;
 
+    private final JScrollPane scrollPane;
+
+    /*
+     * Icons to be on the side panel
+     */
     private final ImageIcon[] icons = {
         ImageUtil.getScaledImage("assets/icon.png", 48, 48),
         ImageUtil.getScaledImage("assets/home.png", 32, 32),
@@ -29,97 +43,61 @@ public final class Window extends JFrame implements ListSelectionListener {
         ImageUtil.getScaledImage("assets/output.png", 32, 32),
     };
 
+    /*
+     * Window setup
+     */
     public Window() {
         super("Pulsar Launcher");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(850, 550);
         this.setLocationRelativeTo(null);
 
+        // Setup main panels
         this.about = new AboutPanel();
-
-        this.home = new HomePanel();
+        this.home = new HomePanel(this);
         this.settings = new SettingsPanel();
         this.output = new OutputPanel();
 
-        JPanel sidePanel = new JPanel();
-        sidePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-
-        this.list = new JList(icons);
-        ((DefaultListCellRenderer)list.getCellRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
-        list.setFixedCellWidth(64);
-        list.setFixedCellHeight(64);
-        list.setSelectedIndex(1);
-        list.setSelectionMode(SelectionMode.SINGLE.ordinal());
-        list.setDragEnabled(false);
-        list.addListSelectionListener(this);
-
-        sidePanel.setBackground(list.getBackground());
-        sidePanel.add(list);
-
+        // Setup side panel
+        this.sidePanel = new SidePanel(icons, this);
         this.add(sidePanel, BorderLayout.WEST);
 
-        // Set panel to home panel
-        setupHome();
-        add(this.home);
-
+        // Load configuration
         Launcher.getInstance().getConfigManager().load(this);
 
+        // Finish window
+        this.scrollPane = new JScrollPane();
+        this.scrollPane.setViewportView(this.home);
+        this.add(this.scrollPane);
         this.setVisible(true);
 
-    }
-
-    private void setupHome() {
-        remove(this.settings);
-        remove(this.output);
-        remove(this.about);
-        add(this.home);
-        validate();
         repaint();
     }
 
-    private void setupSettings() {
-        remove(this.home);
-        remove(this.output);
-        remove(this.about);
-        add(this.settings);
-        validate();
-        repaint();
+    /*
+     * Changes main panel like a book with pages
+     */
+    private void setPanel(JPanel panel) {
+        scrollPane.setViewportView(panel);
     }
 
-    private void setupOutput() {
-        remove(this.home);
-        remove(this.settings);
-        remove(this.about);
-        add(this.output);
-        validate();
-        repaint();
-    }
-
-    private void setupAbout() {
-        remove(this.home);
-        remove(this.settings);
-        remove(this.output);
-        add(this.about);
-        validate();
-        repaint();
-    }
-
+    /*
+     * Changes the main panel when list selection is updated
+     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        switch(list.getSelectedIndex()) {
-        case 0:
-            setupAbout();
-            break;
-        case 1:
-            setupHome();
-            break;
-        case 2:
-            setupSettings();
-            break;
-        case 3:
-            setupOutput();
-            break;
-        }
+        int selected = sidePanel.getValue();
+
+        this.setPanel(switch(selected) {
+            case 0 -> this.about;
+            case 1 -> this.home;
+            case 2 -> this.settings;
+            case 3 -> this.output;
+            default -> throw new IllegalStateException("Unexpected value: " + selected);
+        });
+
+        this.validate();
+        this.repaint();
     }
 
 }

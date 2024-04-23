@@ -1,4 +1,4 @@
-package me.geuxy.gui;
+package me.geuxy.gui.panels.main;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,9 +7,10 @@ import me.geuxy.config.Config;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 @Getter @Setter
-public class SettingsPanel extends JPanel {
+public final class SettingsPanel extends JPanel {
 
     private final JLabel minLabel;
     private final JLabel maxLabel;
@@ -19,6 +20,8 @@ public class SettingsPanel extends JPanel {
 
     private final JCheckBox hideOnLaunch;
     private final JCheckBox singleThreaded;
+
+    private final JTextField mcPath;
 
     private int minRam = 1;
     private int maxRam = 1;
@@ -42,6 +45,11 @@ public class SettingsPanel extends JPanel {
         this.maxRamSlider = new JSlider(1, 8);
         this.maxRamSlider.addChangeListener(onMaxRamChange());
         this.add(this.maxRamSlider);
+
+        this.mcPath = new JTextField();
+        this.mcPath.setMaximumSize(new Dimension(400, 30));
+        this.add(new JLabel("Minecraft path"));
+        this.add(this.mcPath);
 
         // Hide on launch checkbox
         this.hideOnLaunch = new JCheckBox("Hide on launch");
@@ -87,6 +95,8 @@ public class SettingsPanel extends JPanel {
 
         this.hide = config.isHide();
         this.hideOnLaunch.setSelected(this.hide);
+
+        this.mcPath.setText(config.getMcPath());
 
         this.isSingleThread = config.isSingleThreaded();
         this.singleThreaded.setSelected(this.isSingleThread);
