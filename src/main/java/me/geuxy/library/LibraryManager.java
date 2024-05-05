@@ -38,7 +38,7 @@ public final class LibraryManager {
     /*
      * Download and validate libraries
      */
-    public void setupLibraries() {
+    public boolean setupLibraries() {
         File jarsDir = new File("jars");
         FileUtil.createDirectory(jarsDir);
 
@@ -46,7 +46,9 @@ public final class LibraryManager {
             File jar = new File(jarsDir, library.getName() + ".jar");
 
             if(!jar.exists()) {
-                FileUtil.download(library.getUrl(), jar);
+                if(FileUtil.download(library.getUrl(), jar)) {
+                    return true;
+                }
 
             } else if(jar.length() != library.getBytes()) {
                 jar.delete();
@@ -56,6 +58,7 @@ public final class LibraryManager {
                 Logger.info("Found " + library.getName());
             }
         }
+        return false;
     }
 
 }

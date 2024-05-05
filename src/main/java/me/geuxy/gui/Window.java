@@ -13,6 +13,7 @@ import me.geuxy.gui.panels.main.HomePanel;
 import me.geuxy.gui.panels.main.OutputPanel;
 import me.geuxy.gui.panels.main.SettingsPanel;
 import me.geuxy.gui.panels.other.SidePanel;
+import me.geuxy.utils.console.Logger;
 import me.geuxy.utils.render.ImageUtil;
 
 @Getter
@@ -46,11 +47,13 @@ public final class Window extends JFrame implements ListSelectionListener {
     /*
      * Window setup
      */
-    public Window() {
+    public Window(SplashWindow splash) {
         super("Pulsar Launcher");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(850, 550);
         this.setLocationRelativeTo(null);
+
+        splash.setProgress(70);
 
         // Setup main panels
         this.about = new AboutPanel();
@@ -58,12 +61,18 @@ public final class Window extends JFrame implements ListSelectionListener {
         this.settings = new SettingsPanel();
         this.output = new OutputPanel();
 
+        splash.setProgress(80);
+
         // Setup side panel
         this.sidePanel = new SidePanel(icons, this);
         this.add(sidePanel, BorderLayout.WEST);
 
+        splash.setProgress(90);
+
         // Load configuration
         Launcher.getInstance().getConfigManager().load(this);
+
+        splash.setProgress(99);
 
         // Finish window
         this.scrollPane = new JScrollPane();
@@ -71,7 +80,7 @@ public final class Window extends JFrame implements ListSelectionListener {
         this.add(this.scrollPane);
         this.setVisible(true);
 
-        repaint();
+        splash.dispose();
     }
 
     /*
@@ -89,6 +98,7 @@ public final class Window extends JFrame implements ListSelectionListener {
         int selected = sidePanel.getValue();
 
         this.setPanel(switch(selected) {
+            case -1 -> null;
             case 0 -> this.about;
             case 1 -> this.home;
             case 2 -> this.settings;

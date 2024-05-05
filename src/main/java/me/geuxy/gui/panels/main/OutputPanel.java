@@ -14,7 +14,6 @@ public final class OutputPanel extends JPanel {
 
         this.textArea = new JTextArea();
         this.textArea.setEditable(false);
-        this.textArea.setFocusable(false);
 
         JScrollPane pane = new JScrollPane(textArea) {
 

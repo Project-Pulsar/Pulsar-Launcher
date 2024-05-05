@@ -6,6 +6,10 @@ import java.awt.event.ActionListener;
 import me.geuxy.Launcher;
 import me.geuxy.config.Config;
 import me.geuxy.gui.Window;
+import me.geuxy.utils.console.Logger;
+import me.geuxy.utils.swing.SwingUtil;
+
+import javax.swing.*;
 
 public final class LaunchAction implements ActionListener {
 
@@ -28,7 +32,11 @@ public final class LaunchAction implements ActionListener {
 
         Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], mcPath, hide, singleThreaded));
 
-        Runnable runnable = () -> Launcher.getInstance().startClient(getFixedRam());
+        Runnable runnable = () -> {
+            if(Launcher.getInstance().startClient(getFixedRam())) {
+                Logger.info("Failed to launch the client due to an error!");
+            }
+        };
 
         if(singleThreaded) {
             runnable.run();

@@ -26,7 +26,7 @@ public final class FileUtil {
      * @param url link to download file from
      * @param file location to save file to
      */
-    public static void download(String url, File file) {
+    public static boolean download(String url, File file) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestProperty("User-Agent", "my-agent");
@@ -37,7 +37,10 @@ public final class FileUtil {
             }
         } catch(IOException e) {
             Logger.error("Failed to download '" + file.getName() + "' from '" + url + "'!");
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -119,16 +122,17 @@ public final class FileUtil {
      * @param file directory location to be created
      */
     public static void createDirectory(File file) {
-        if(!file.exists()) {
-            Logger.warn("Directory '" + file.getPath() + "' already exists, skipping!");
+        // Commented because it kept saying "already exists" when it does not!
+        /*if(!file.exists()) {
+            Logger.warn("Directory '" + file.getAbsolutePath() + "' already exists, skipping!");
             return;
-        }
+        }*/
 
         if(file.mkdir()) {
-            Logger.info("Created new directory: " + file.getPath());
+            Logger.info("Created new directory: " + file.getAbsolutePath());
 
         } else {
-            Logger.error("Failed to make directory: " + file.getPath());
+            Logger.warn("Failed to make directory: " + file.getAbsolutePath());
         }
     }
 

@@ -1,7 +1,5 @@
 package me.geuxy.gui.panels.other;
 
-import javafx.scene.control.SelectionMode;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -18,9 +16,10 @@ public final class SidePanel extends JPanel {
         list.setFixedCellWidth(64);
         list.setFixedCellHeight(64);
         list.setSelectedIndex(1);
-        list.setSelectionMode(SelectionMode.SINGLE.ordinal());
+        list.setSelectionMode(0);
         list.setDragEnabled(false);
         list.addListSelectionListener(listener);
+        list.setSelectionBackground(0xFF64C3FF);
 
         this.setBackground(list.getBackground());
         this.add(list);
