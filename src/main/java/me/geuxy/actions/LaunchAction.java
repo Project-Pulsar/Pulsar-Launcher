@@ -29,8 +29,11 @@ public final class LaunchAction implements ActionListener {
         boolean singleThreaded = window.getSettings().isSingleThread();
         boolean hide = window.getSettings().isHide();
         String mcPath = window.getSettings().getMcPath().getText();
+        String repo = window.getSettings().getRepository().getText();
+        String args = window.getSettings().getArguments().getText();
+        boolean autoRepair = window.getSettings().isAutoRepair();
 
-        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], mcPath, hide, singleThreaded));
+        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], mcPath, repo, args, hide, singleThreaded, autoRepair));
 
         Runnable runnable = () -> {
             if(Launcher.getInstance().startClient(getFixedRam())) {

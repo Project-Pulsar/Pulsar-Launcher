@@ -19,7 +19,7 @@ public final class SidePanel extends JPanel {
         list.setSelectionMode(0);
         list.setDragEnabled(false);
         list.addListSelectionListener(listener);
-        list.setSelectionBackground(0xFF64C3FF);
+        list.setSelectionBackground(new Color(0xFF64C3FF));
 
         this.setBackground(list.getBackground());
         this.add(list);

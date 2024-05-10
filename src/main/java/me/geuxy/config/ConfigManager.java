@@ -15,8 +15,10 @@ public record ConfigManager(Gson gson, File file) {
     }
 
     public void load(Window window) {
-        if(!this.file.exists())
-            save(new Config(1, 2, OSHelper.getOS().getMinecraft(), false, false));
+        if(!this.file.exists()) {
+            String defaultRepo = "https://raw.githubusercontent.com/Project-Pulsar/Cloud/main/PulsarLauncher/repository.json";
+            save(new Config(1, 2, OSHelper.getOS().getMinecraft(), defaultRepo, "", false, false, true));
+        }
 
         window.getSettings().updateSettings(this.gson.fromJson(FileUtil.readJson(this.file), Config.class));
     }

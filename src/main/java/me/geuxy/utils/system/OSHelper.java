@@ -1,6 +1,7 @@
 package me.geuxy.utils.system;
 
 import java.io.File;
+import java.util.stream.Stream;
 
 public enum OSHelper {
 
@@ -16,12 +17,11 @@ public enum OSHelper {
      */
     private final String directory;
 
-    OSHelper(String... dir) {
+    OSHelper(String... directories) {
         StringBuilder builder = new StringBuilder();
 
-        for(String d : dir) {
-            builder.append(d).append(File.separator);
-        }
+        Stream.of(directories).forEach(d -> builder.append(d).append(File.separator));
+
         this.directory = builder.toString();
     }
 

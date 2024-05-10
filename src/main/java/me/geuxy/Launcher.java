@@ -13,13 +13,14 @@ import javax.swing.*;
 
 import lombok.Getter;
 
-import me.geuxy.api.GithubAPI;
+import me.geuxy.repository.Repository;
 import me.geuxy.config.ConfigManager;
 import me.geuxy.gui.SplashWindow;
 import me.geuxy.gui.Window;
 import me.geuxy.library.LibraryManager;
 import me.geuxy.utils.console.Logger;
 import me.geuxy.utils.file.FileUtil;
+import me.geuxy.utils.math.RandomUtil;
 import me.geuxy.utils.swing.SwingUtil;
 import me.geuxy.utils.system.OSHelper;
 
@@ -29,7 +30,7 @@ public final class Launcher {
     @Getter
     private static Launcher instance;
 
-    private final GithubAPI githubAPI;
+    private final Repository repository;
     private final LibraryManager libraryManager;
     private final ConfigManager configManager;
 
@@ -42,6 +43,8 @@ public final class Launcher {
     private final String name;
     private final String version;
 
+    private long launchTime;
+
     public Launcher() {
         instance = this;
 
@@ -52,19 +55,12 @@ public final class Launcher {
 
         this.gson = new GsonBuilder().setPrettyPrinting().create();
 
-        splash.setProgress(10);
-
-        this.githubAPI = new GithubAPI();
-
-        splash.setProgress(20);
-
-        this.libraryManager = new LibraryManager(this.gson);
-
-        splash.setProgress(30);
-
         this.configManager = new ConfigManager(this.gson, new File("config.json"));
 
-        splash.setProgress(60);
+        this.repository = new Repository();
+        this.repository.setRepository("https://raw.githubusercontent.com/Project-Pulsar/Cloud/main/PulsarLauncher/repository.json");
+
+        this.libraryManager = new LibraryManager(this.gson, gson.toJson(repository.getLibraries()));
 
         Logger.info("Initializing window...");
 
@@ -84,6 +80,9 @@ public final class Launcher {
 
             this.running = true;
 
+            FileUtil.createDirectory(new File("clients"));
+            FileUtil.createDirectory(new File("clients", repository.getName()));
+
             // Clear console output
             this.window.getOutput().clear();
 
@@ -92,7 +91,7 @@ public final class Launcher {
             }
 
             // download and validate the libraries and natives
-            if(libraryManager.setupLibraries()) {
+            if(libraryManager.setupLibraries(window.getSettings().isAutoRepair())) {
                 SwingUtil.showErrorPopup("Failed to launch client", "Unable to setup libraries!");
                 return true;
             }
@@ -102,7 +101,9 @@ public final class Launcher {
                 return true;
             }
 
-            String jarsDir = "jars" + File.separator;
+            String clientDir = "clients" + File.separator + repository.getName() + File.separator;
+
+            String jarsDir = clientDir + "jars" + File.separator;
             String gameDir = this.window.getSettings().getMcPath().getText();
             String minRam = "-Xms" + ram[0] + "G";
             String maxRam = "-Xmx" + ram[1] + "G";
@@ -112,7 +113,9 @@ public final class Launcher {
 
             // WHY THE HECK DOES THIS WORK???!?!?
             String separator = (OSHelper.getOS() == OSHelper.WINDOWS) ? ";" : ":";
-            String exec = "java " + minRam + " " + maxRam + " -Djava.library.path=bin -cp " + jarsDir + "Pulsar.jar" + separator + jarsDir + "* net.minecraft.client.main.Main -uuid N/A -version 1.8.8 --accessToken none --assetIndex 1.8 --gameDir " + gameDir + " --width 800 --height 500";
+            String exec = "java " + minRam + " " + maxRam + " -Djava.library.path=" + clientDir + "bin" + " -cp " + jarsDir + repository.getJarName() + ".jar" + separator + jarsDir + "* " + repository.getMain() + " -uuid N/A -version " + repository.getVersion() + " --accessToken none --assetIndex " + repository.getAssetIndex() + " --gameDir " + gameDir + " " + window.getSettings().getArguments().getText();
+
+            launchTime = System.currentTimeMillis();
 
             // Execute the game
             Logger.debug(exec);
@@ -147,6 +150,12 @@ public final class Launcher {
 
         this.window.setVisible(true);
 
+        if(System.currentTimeMillis() - launchTime <= 1_000 * 10) {
+            SwingUtil.showInfoPopup("Detected short launch time", "Did the game close unexpectedly? Check the console!");
+        }
+
+        launchTime = 0;
+
         return false;
     }
 
@@ -154,10 +163,11 @@ public final class Launcher {
      * Downloads natives depending on the users OS
      */
     public boolean setupNatives() {
-        File cache = new File("cache");
+        File cache = new File("temp");
 
-        File binDirectory = new File("bin");
-        File binZip = new File(cache, "bin.zip");
+        File client = new File("clients", repository.getName());
+        File binDirectory = new File(client, "bin");
+        File binZip = new File(cache, "bin-" + RandomUtil.range(1, 99_999_999) + ".zip");
 
         boolean empty = binDirectory.list() != null && binDirectory.list().length == 0;
 
@@ -166,14 +176,10 @@ public final class Launcher {
                 binDirectory.delete();
             }
 
-            boolean cacheEmpty = cache.list() != null && cache.list().length == 0;
+            FileUtil.createDirectory(cache);
 
-            if(!cache.exists() || cacheEmpty) {
-                FileUtil.createDirectory(cache);
-
-                if (FileUtil.download(githubAPI.getNativesByOS(), binZip)) {
-                    return true;
-                }
+            if (FileUtil.download(repository.getNativesByOS(), binZip)) {
+                return true;
             }
             FileUtil.unzip(binZip.getPath(), binDirectory.getPath());
 
@@ -184,13 +190,14 @@ public final class Launcher {
         return false;
     }
 
-    public void clearCache() {
-        Stream.of(new File("cache").listFiles()).forEach(File::delete);
-        SwingUtil.showInfoPopup("Successful operation", "Successfully cleared cache!");
+    public void clearTemp() {
+        Stream.of(new File("temp").listFiles()).forEach(File::delete);
+        SwingUtil.showInfoPopup("Successful operation", "Successfully cleared temp!");
     }
 
     public void regenerateNatives() {
-        File file = new File("bin");
+        File client = new File("clients", repository.getName());
+        File file = new File(client, "bin");
 
         Stream.of(file.listFiles()).forEach(File::delete);
         file.delete();
@@ -199,6 +206,18 @@ public final class Launcher {
             SwingUtil.showErrorPopup("Unexpected Error", "Failed to setup natives!");
         } else {
             SwingUtil.showInfoPopup("Successful operation", "Successfully regenerated natives!");
+        }
+    }
+
+    public void clearLogs() {
+        File logs = new File("logs");
+
+        if(logs.exists() && logs.list() != null && logs.list().length != 0) {
+            Stream.of(logs.listFiles()).forEach(File::delete);
+            SwingUtil.showInfoPopup("Successful Operation", "Successfully cleared logs!");
+
+        } else {
+            SwingUtil.showErrorPopup("Unexpected Error", "File does not exist or is empty!");
         }
     }
 

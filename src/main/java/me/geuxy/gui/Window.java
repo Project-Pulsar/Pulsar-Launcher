@@ -53,26 +53,18 @@ public final class Window extends JFrame implements ListSelectionListener {
         this.setSize(850, 550);
         this.setLocationRelativeTo(null);
 
-        splash.setProgress(70);
-
         // Setup main panels
         this.about = new AboutPanel();
         this.home = new HomePanel(this);
         this.settings = new SettingsPanel();
         this.output = new OutputPanel();
 
-        splash.setProgress(80);
-
         // Setup side panel
         this.sidePanel = new SidePanel(icons, this);
         this.add(sidePanel, BorderLayout.WEST);
 
-        splash.setProgress(90);
-
         // Load configuration
         Launcher.getInstance().getConfigManager().load(this);
-
-        splash.setProgress(99);
 
         // Finish window
         this.scrollPane = new JScrollPane();

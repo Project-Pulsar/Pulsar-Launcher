@@ -32,7 +32,7 @@ public final class AboutPanel extends JPanel {
                 super.paintComponent(g);
 
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(new Color(0xFF4B6EAF));
+                g2.setColor(new Color(0xFF64C3FF));
                 g2.fillRect(0, 0, 2, this.getHeight());
                 g2.dispose();
             }

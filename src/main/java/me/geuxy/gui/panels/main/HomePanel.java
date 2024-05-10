@@ -23,13 +23,13 @@ public final class HomePanel extends JPanel {
                 super.paintComponent(g);
 
                 Graphics2D g2 = (Graphics2D) g;
-                g2.setColor(new Color(0xFF4B6EAF));
+                g2.setColor(new Color(0xFF64C3FF));
                 g2.fillRect(0, 0, 2, this.getHeight());
                 g2.dispose();
             }
         };
         news.setEditorKit(new HTMLEditorKit());
-        news.setText(FileUtil.read(Launcher.getInstance().getGithubAPI().CHANGELOG_URL, "<br>"));
+        news.setText(FileUtil.read(Launcher.getInstance().getRepository().getChangelogUrl(), "<br>"));
         news.setEditable(false);
         news.setFocusable(false);
         JScrollPane scrollPane = new JScrollPane(news);
