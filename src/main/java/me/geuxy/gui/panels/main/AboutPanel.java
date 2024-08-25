@@ -9,7 +9,7 @@ import java.awt.*;
 
 public final class AboutPanel extends JPanel {
 
-    // hardcode this because why not :)
+    // felt like hardcoding
     private final String[][] credits = {
         {"Geuxy", "Owner"},
         {"Kolotheegg", "Developer"},

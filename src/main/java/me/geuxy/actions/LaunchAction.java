@@ -7,9 +7,6 @@ import me.geuxy.Launcher;
 import me.geuxy.config.Config;
 import me.geuxy.gui.Window;
 import me.geuxy.utils.console.Logger;
-import me.geuxy.utils.swing.SwingUtil;
-
-import javax.swing.*;
 
 public final class LaunchAction implements ActionListener {
 
@@ -33,7 +30,9 @@ public final class LaunchAction implements ActionListener {
         String args = window.getSettings().getArguments().getText();
         boolean autoRepair = window.getSettings().isAutoRepair();
 
-        Launcher.getInstance().getConfigManager().save(new Config(fixedRam[0], fixedRam[1], mcPath, repo, args, hide, singleThreaded, autoRepair));
+        Config config = new Config(fixedRam[0], fixedRam[1], mcPath, repo, args, hide, singleThreaded, autoRepair);
+
+        Launcher.getInstance().getConfigManager().save(config);
 
         Runnable runnable = () -> {
             if(Launcher.getInstance().startClient(getFixedRam())) {

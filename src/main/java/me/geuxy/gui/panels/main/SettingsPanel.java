@@ -114,6 +114,10 @@ public final class SettingsPanel extends JPanel {
         clearLogs.addActionListener(e -> Launcher.getInstance().clearLogs());
         clearLogs.setAlignmentX(LEFT_ALIGNMENT);
 
+        JButton applyChanges = new JButton("Apply Changes");
+        applyChanges.addActionListener(e -> Launcher.getInstance().getConfigManager().save(new Config(minRamSlider.getValue(), maxRamSlider.getValue(), mcPath.getText(), repository.getText(), arguments.getText(), hideOnLaunch.getVerifyInputWhenFocusTarget(), isSingleThread, autoRepair)));
+        applyChanges.setAlignmentX(LEFT_ALIGNMENT);
+
         Component[][] comps = {
             {repositoryLabel, repository},
             {mcPathLabel, mcPath},
@@ -126,6 +130,7 @@ public final class SettingsPanel extends JPanel {
             {regenNatives},
             {clearTemp},
             {clearLogs},
+            {applyChanges},
         };
 
         for(Component[] compList : comps) {

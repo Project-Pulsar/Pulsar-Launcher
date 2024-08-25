@@ -34,8 +34,8 @@ public final class Repository {
         JsonObject json = Launcher.getInstance().getGson().fromJson(FileUtil.read(rawUrl), JsonObject.class);
 
         JsonObject infoJson = json.get("Info").getAsJsonObject();
-        JsonObject natJson = json.get("Natives").getAsJsonObject();
-        JsonArray libJson = json.get("Libraries").getAsJsonArray();
+        JsonObject nativesJson = json.get("Natives").getAsJsonObject();
+        JsonArray librariesJson = json.get("Libraries").getAsJsonArray();
 
         this.name = infoJson.get("name").getAsString();
         this.jarName = infoJson.get("jar").getAsString();
@@ -43,8 +43,8 @@ public final class Repository {
         this.version = infoJson.get("version").getAsString();
         this.assetIndex = infoJson.get("assetIndex").getAsString();
         this.main = infoJson.get("main").getAsString();
-        this.natives = natJson;
-        this.libraries = libJson;
+        this.natives = nativesJson;
+        this.libraries = librariesJson;
     }
 
     /**
@@ -53,8 +53,6 @@ public final class Repository {
      * @return url link to the compressed bin zip file
      */
     public String getNativesByOS() {
-        String extension = ".zip";
-
         return natives.get(OSHelper.getOSName()).getAsString();
     }
 

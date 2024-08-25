@@ -13,7 +13,6 @@ import me.geuxy.gui.panels.main.HomePanel;
 import me.geuxy.gui.panels.main.OutputPanel;
 import me.geuxy.gui.panels.main.SettingsPanel;
 import me.geuxy.gui.panels.other.SidePanel;
-import me.geuxy.utils.console.Logger;
 import me.geuxy.utils.render.ImageUtil;
 
 @Getter

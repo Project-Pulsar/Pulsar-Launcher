@@ -122,11 +122,10 @@ public final class FileUtil {
      * @param file directory location to be created
      */
     public static void createDirectory(File file) {
-        // Commented because it kept saying "already exists" when it does not!
-        /*if(!file.exists()) {
+        if(file.exists()) {
             Logger.warn("Directory '" + file.getAbsolutePath() + "' already exists, skipping!");
             return;
-        }*/
+        }
 
         if(file.mkdir()) {
             Logger.info("Created new directory: " + file.getAbsolutePath());

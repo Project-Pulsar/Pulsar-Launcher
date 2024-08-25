@@ -45,6 +45,8 @@ public final class Launcher {
 
     private long launchTime;
 
+    private final String defaultRepo = "https://raw.githubusercontent.com/Project-Pulsar/Cloud/main/PulsarLauncher/repository.json";
+
     public Launcher() {
         instance = this;
 
@@ -58,7 +60,7 @@ public final class Launcher {
         this.configManager = new ConfigManager(this.gson, new File("config.json"));
 
         this.repository = new Repository();
-        this.repository.setRepository("https://raw.githubusercontent.com/Project-Pulsar/Cloud/main/PulsarLauncher/repository.json");
+        this.repository.setRepository(defaultRepo);
 
         this.libraryManager = new LibraryManager(this.gson, gson.toJson(repository.getLibraries()));
 
@@ -167,7 +169,7 @@ public final class Launcher {
 
         File client = new File("clients", repository.getName());
         File binDirectory = new File(client, "bin");
-        File binZip = new File(cache, "bin-" + RandomUtil.range(1, 99_999_999) + ".zip");
+        File binZip = new File(cache, "bin-" + System.currentTimeMillis() + ".zip");
 
         boolean empty = binDirectory.list() != null && binDirectory.list().length == 0;
 
