@@ -15,7 +15,6 @@ public final class AboutPanel extends JPanel {
         {"Kolotheegg", "Developer"},
         {"Tabio", "Old Developer"},
         {"Liticane", "External Developer"},
-        {"MoonX Devs", "External Developers"},
         {"FelixH2012", "External Developer"}
     };
 
